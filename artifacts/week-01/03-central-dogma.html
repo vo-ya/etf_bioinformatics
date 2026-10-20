@@ -1,0 +1,743 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coding DNA to amino acids — Week 1</title>
+<link rel="stylesheet" href="../_shared/artifact-theme.css">
+<!-- Adapted from bioinformatis-web/artifacts/lecture-01/02-central-dogma.html.
+Apache-2.0; see ../../third_party/bioinformatis-web-LICENSE.
+Modified for the introductory Week 1 pilot: explicit coding strand and frame,
+strict input validation, stop-aware decoding, simpler presets, keyboard/status,
+local dependencies only, corrected timer handling. --><style>
+    /* ─── Amino-acid category tokens (local to this artifact) ─────── */
+    :root {
+      --aa-hydrophobic: #f0e7cb;   /* warm tan   — A V L I M F W P */
+      --aa-polar:       #cfe5e6;   /* cool cyan  — S T N Q Y C     */
+      --aa-acidic:      #f3d6cf;   /* warm rose  — D E             */
+      --aa-basic:       #d5dff0;   /* cool blue  — K R H           */
+      --aa-special:     #e5dcec;   /* lavender   — G               */
+      --aa-stop:        #d9d5ca;   /* neutral    — * (STOP)        */
+    }
+
+    /* ─── Frame ──────────────────────────────────────────── */
+    body {
+      background: var(--bg);
+      padding: 2rem;
+    }
+    .artifact {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ─── Head ───────────────────────────────────────────── */
+    .artifact-head { margin-bottom: 1.5rem; }
+    .artifact-head h1 {
+      font-family: var(--font-serif);
+      font-size: var(--text-3xl);
+      letter-spacing: -0.02em;
+      margin: 0 0 0.25rem;
+    }
+    .artifact-head p {
+      color: var(--fg-muted);
+      font-size: var(--text-sm);
+      line-height: var(--leading-relaxed);
+      margin: 0;
+      max-width: 60ch;
+    }
+
+    /* ─── Panels ─────────────────────────────────────────── */
+    .panel {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .panel-label {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      margin: 0 0 0.85rem;
+      font-weight: 600;
+    }
+
+    /* ─── Controls ───────────────────────────────────────── */
+    .controls { display: grid; gap: 1rem; }
+
+    .field { display: flex; flex-direction: column; gap: 0.4rem; }
+    .field-label {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--fg-muted);
+    }
+    .seq-row { display: flex; gap: 0.5rem; }
+    .seq-input {
+      flex: 1;
+      font-family: var(--font-mono);
+      font-size: var(--text-base);
+      letter-spacing: 0.04em;
+      padding: 0.55rem 0.75rem;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      min-width: 0;
+    }
+    .seq-input:focus { background: var(--bg-elevated); border-color: var(--accent-bright); }
+
+    .field-note {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      color: var(--fg-subtle);
+      margin: 0;
+      line-height: var(--leading-normal);
+    }
+    .field-note code {
+      font-family: var(--font-mono);
+      background: var(--bg-inset);
+      padding: 0.05em 0.3em;
+      border-radius: var(--radius-sm);
+      font-size: 0.95em;
+    }
+
+    /* Buttons */
+    .btn {
+      font-family: var(--font-sans);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      padding: 0.5rem 0.9rem;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--fg);
+      cursor: pointer;
+      transition: background 120ms ease, border-color 120ms ease;
+      white-space: nowrap;
+    }
+    .btn:hover:not(:disabled) {
+      background: var(--bg-inset);
+      border-color: var(--border-strong);
+    }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn--primary {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+    .btn--primary:hover:not(:disabled) {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    .playback {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.25rem;
+      align-items: center;
+    }
+    .playback-buttons { display: flex; gap: 0.4rem; }
+    .playback-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: var(--text-sm);
+      color: var(--fg-muted);
+    }
+    .playback-group input[type="range"] {
+      width: 110px;
+      accent-color: var(--accent);
+    }
+    .frame-fieldset {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 0;
+      padding: 0;
+      margin: 0;
+      font-size: var(--text-sm);
+      color: var(--fg-muted);
+    }
+    .frame-fieldset legend {
+      display: contents;
+    }
+    .frame-choices {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    .frame-choices label {
+      padding: 0.35rem 0.6rem;
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      color: var(--fg-muted);
+      cursor: pointer;
+      background: var(--bg-muted);
+      border-right: 1px solid var(--border);
+    }
+    .frame-choices label:last-child { border-right: 0; }
+    .frame-choices input {
+      position: absolute;
+      width: 1px; height: 1px;
+      margin: -1px; padding: 0;
+      overflow: hidden; clip: rect(0 0 0 0);
+      border: 0;
+    }
+    .frame-choices label:has(input:checked) {
+      background: var(--accent);
+      color: #ffffff;
+    }
+    .frame-choices label:focus-within {
+      outline: 2px solid var(--accent-bright);
+      outline-offset: -2px;
+      z-index: 1;
+    }
+
+    /* ─── Status line ────────────────────────────────────── */
+    .status-line {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      font-family: var(--font-sans);
+      font-size: var(--text-sm);
+      color: var(--fg-muted);
+      padding: 0.75rem 1rem;
+      background: var(--bg-muted);
+      border-radius: var(--radius-sm);
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--border);
+    }
+    .status-line strong { color: var(--fg); font-weight: 600; }
+
+    /* ─── Strands ────────────────────────────────────────── */
+    .strands {
+      --cell: 1.55rem;
+      overflow-x: auto;
+      padding: 0.25rem;
+    }
+
+    .strand-row {
+      display: grid;
+      grid-template-columns: 4rem 1rem 1fr 1rem;
+      column-gap: 0.5rem;
+      align-items: center;
+      margin: 0.35rem 0;
+      min-width: min-content;
+    }
+
+    .strand-row--proteins {
+      grid-template-columns: 4rem 1rem 1fr 1rem;
+      margin-top: 0.6rem;
+    }
+
+    .strand-label {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-muted);
+      font-weight: 600;
+      justify-self: start;
+    }
+    .strand-end {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      color: var(--fg-subtle);
+      font-weight: 500;
+      justify-self: center;
+    }
+
+    .strand-bases, .strand-proteins {
+      display: grid;
+      grid-template-columns: repeat(var(--n, 0), var(--cell));
+      gap: 0;
+      font-family: var(--font-mono);
+      min-width: min-content;
+    }
+
+    .base {
+      text-align: center;
+      font-weight: 500;
+      font-size: 1.05rem;
+      line-height: 1.4;
+      border-radius: var(--radius-sm);
+      transition: background 180ms ease, color 180ms ease, transform 180ms ease;
+      position: relative;
+    }
+
+    .base.is-A { color: var(--base-a); }
+    .base.is-T { color: var(--base-t); }
+    .base.is-G { color: var(--base-g); }
+    .base.is-C { color: var(--base-c); }
+    .base.is-U { color: var(--base-u); }
+    .base.is-N { color: var(--base-n); }
+
+    /* Base states along the animation timeline */
+    .base.is-read     { opacity: 0.55; }
+    .base.is-active   { background: var(--accent-bg); outline: 1px solid var(--accent); outline-offset: -1px; }
+    .base.is-upcoming { opacity: 1; }
+    .base.in-start    { background: #eaf7ee; outline: 1px solid var(--success); outline-offset: -1px; }
+    .base.in-stop     { background: #fbeaea; outline: 1px solid var(--error); outline-offset: -1px; }
+    .base.is-offframe { opacity: 0.25; }
+
+    .base.is-partial {
+      background: repeating-linear-gradient(
+        45deg,
+        var(--bg-muted) 0 3px,
+        transparent 3px 6px
+      );
+    }
+
+    /* Protein amino-acid tiles */
+    .aa-slot {
+      grid-column: span 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.35rem 0.25rem;
+      margin: 0 2px;
+      min-height: 2.8rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      background: var(--bg-muted);
+      transition: background 220ms ease, border-color 220ms ease, transform 220ms ease;
+    }
+
+    .aa-slot.is-placeholder { background: transparent; border: 1px dashed var(--border); }
+    .aa-slot.is-pending     { background: var(--bg-muted); }
+    .aa-slot.is-visible     { transform: none; }
+    .aa-slot.just-added     { animation: aa-pop 380ms ease; }
+    .aa-slot.is-current     { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-bg); }
+
+    .aa-1 {
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 1.05rem;
+      line-height: 1;
+      color: var(--fg);
+    }
+    .aa-3 {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      color: var(--fg-muted);
+      letter-spacing: 0.04em;
+      margin-top: 2px;
+    }
+
+    .aa-cat-hydrophobic { background: var(--aa-hydrophobic); }
+    .aa-cat-polar       { background: var(--aa-polar); }
+    .aa-cat-acidic      { background: var(--aa-acidic); }
+    .aa-cat-basic       { background: var(--aa-basic); }
+    .aa-cat-special     { background: var(--aa-special); }
+    .aa-cat-stop        { background: var(--aa-stop); }
+    .aa-cat-stop .aa-1  { color: var(--error); }
+    .aa-cat-stop .aa-3  { color: var(--error); opacity: 0.75; }
+
+    @keyframes aa-pop {
+      0%   { transform: scale(0.88); opacity: 0.2; }
+      60%  { transform: scale(1.04); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* ─── Annotations under strands ──────────────────────── */
+    .annotations {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      color: var(--fg-muted);
+      margin-top: 0.75rem;
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .annotation-dot {
+      display: inline-block;
+      width: 0.65rem;
+      height: 0.65rem;
+      border-radius: 50%;
+      margin-right: 0.4rem;
+      vertical-align: middle;
+    }
+    .dot-start { background: var(--success); }
+    .dot-stop  { background: var(--error); }
+    .dot-curr  { background: var(--accent); }
+
+    /* ─── Codon table ────────────────────────────────────── */
+    .codon-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .codon-head p {
+      font-size: var(--text-sm);
+      color: var(--fg-muted);
+      margin: 0;
+      max-width: 55ch;
+    }
+
+    .codon-table-grid {
+      display: grid;
+      grid-template-columns: auto auto repeat(4, 1fr) auto;
+      border-collapse: collapse;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+
+    .cth, .ctc {
+      background: var(--bg-elevated);
+      padding: 0.45rem 0.5rem;
+      font-size: var(--text-xs);
+    }
+
+    .cth-main {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      background: var(--bg-muted);
+      text-align: center;
+      font-weight: 600;
+    }
+    .cth-axis {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      background: var(--bg-muted);
+      text-align: center;
+      color: var(--fg);
+    }
+    .cth-axis-A, .cth-axis-3rd { writing-mode: horizontal-tb; }
+
+    .ctc { padding: 0; background: transparent; }
+
+    .codon-cell {
+      display: grid;
+      grid-template-rows: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+    }
+
+    .codon-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.25rem;
+      padding: 0.25rem 0.45rem;
+      background: var(--bg-elevated);
+      border: 0;
+      cursor: pointer;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--fg);
+      transition: background 150ms ease, outline 150ms ease, transform 150ms ease;
+      position: relative;
+      outline: 2px solid transparent;
+      outline-offset: -2px;
+    }
+    .codon-btn:hover { filter: brightness(0.97); }
+    .codon-btn .codon-letters { letter-spacing: 0.04em; }
+    .codon-btn .aa-tag {
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: var(--text-xs);
+      color: var(--fg);
+    }
+    .codon-btn.is-stop .aa-tag { color: var(--error); }
+
+    .codon-btn.is-highlighted {
+      outline: 2px solid var(--accent);
+      z-index: 2;
+    }
+    .codon-btn.is-current {
+      outline: 2px solid var(--accent);
+      animation: pulse 900ms ease-in-out infinite alternate;
+      z-index: 3;
+    }
+
+    @keyframes pulse {
+      from { box-shadow: 0 0 0 0 rgba(30, 58, 138, 0.0); }
+      to   { box-shadow: 0 0 0 5px rgba(30, 58, 138, 0.18); }
+    }
+
+    /* ─── Legend ─────────────────────────────────────────── */
+    .legend {
+      list-style: none;
+      padding: 0;
+      margin: 1rem 0 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem 0.75rem;
+      font-size: var(--text-xs);
+      color: var(--fg-muted);
+    }
+    .legend li { display: flex; align-items: center; gap: 0.4rem; }
+    .legend-swatch {
+      width: 1.75rem;
+      height: 0.9rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    /* ─── Responsive ─────────────────────────────────────── */
+    @media (max-width: 720px) {
+      body { padding: 1rem; }
+      .panel { padding: 1rem; }
+      .artifact-head h1 { font-size: var(--text-2xl); }
+      .strand-row { grid-template-columns: 3rem 0.75rem 1fr 0.75rem; }
+      .strand-label { font-size: 0.625rem; }
+      .codon-table-grid { font-size: 0.7rem; }
+      .codon-btn { padding: 0.2rem 0.3rem; }
+    }
+
+body {padding:1.25rem} .artifact {max-width:1000px}
+.artifact-head p {max-width:85ch} .field-note,.hint {font-size:.85rem;color:var(--fg-muted)}
+.error {color:var(--error);font-weight:600;min-height:1.5em;margin:.4rem 0}
+.example-strip {display:flex;gap:.4rem;flex-wrap:wrap;margin:.7rem 0}
+.model-note {border-left:3px solid var(--accent);padding:.3rem 1rem;background:var(--accent-bg)}
+.peptide-summary {font-size:1.05rem;margin:.8rem 0 0}.codon-scroll {overflow:auto}
+.codon-table-grid {min-width:620px}.aa-slot.after-stop {opacity:.45}
+.provenance {font-size:.75rem;color:var(--fg-muted)}
+summary {cursor:pointer;font-weight:600} .status-line {min-height:3rem}
+@media (prefers-reduced-motion:reduce) {* {animation:none!important;transition:none!important}}
+@media(max-width:600px) {.seq-row {flex-wrap:wrap}.playback-buttons {flex-wrap:wrap}}
+</style></head><body>
+<main class="artifact" data-artifact="central-dogma">
+<header class="artifact-head"><h1>From coding DNA to amino acids</h1>
+<p>Predict what changes when one DNA letter changes. Then step through the codons: DNA → RNA → a sequence of amino acids.</p></header>
+<p class="model-note">The display uses a coding DNA strand written 5′→3′. Its RNA sequence has U in place of T; transcription uses the complementary DNA template. Decoding begins at the frame you select. The tool omits initiation, splicing, and regulation, so its output gives an amino-acid sequence without predicting RNA or protein abundance.</p>
+<section class="panel controls" aria-label="Sequence and playback controls">
+<div class="field"><label for="seq-input" class="field-label">Coding DNA, 5′→3′</label>
+<input id="seq-input" class="seq-input" value="ATGGCTTTCTAA" spellcheck="false" autocomplete="off" aria-describedby="seq-note input-error">
+<p id="seq-note" class="field-note">Enter 3–90 uppercase A/C/G/T letters. Spaces, lowercase letters, and unknown bases are reported; your input is never silently cleaned.</p>
+<p id="input-error" class="error" role="alert"></p></div>
+<div class="example-strip" aria-label="Sequence examples">
+<button class="btn" type="button" data-sequence="ATGGCTTTCTAA">Default</button>
+<button class="btn" type="button" data-sequence="ATGGCCTTCTAA">One synonymous change</button>
+<button class="btn" type="button" data-sequence="ATGTAAGCTTTC">Early stop</button></div>
+<div class="playback"><div class="playback-buttons">
+<button id="play-btn" type="button" class="btn btn--primary">▶ Play</button>
+<button id="pause-btn" type="button" class="btn" disabled>Pause</button>
+<button id="step-btn" type="button" class="btn">Step one codon</button>
+<button id="reset-btn" type="button" class="btn">Reset</button></div>
+<label class="playback-group">Speed <input id="speed" type="range" min="1" max="10" value="5" aria-label="Playback speed"></label>
+<fieldset class="frame-fieldset"><legend>Read from base</legend><div class="frame-choices">
+<label><input type="radio" name="frame" value="0" checked><span>1 (+1)</span></label>
+<label><input type="radio" name="frame" value="1"><span>2 (+2)</span></label>
+<label><input type="radio" name="frame" value="2"><span>3 (+3)</span></label>
+</div></fieldset></div>
+<p class="field-note">Keyboard: Tab reaches controls; Enter or Space activates a button. Arrow keys change the focused frame or speed control.</p></section>
+<div id="status-line" class="status-line" role="status" aria-live="polite" aria-atomic="true"></div>
+<section class="panel" aria-label="Sequence comparison">
+<p class="panel-label">Coding DNA, RNA, and amino acids</p><div class="strands">
+<div class="strand-row"><span class="strand-label">Coding DNA</span><span class="strand-end">5′</span><div id="dna-bases" class="strand-bases"></div><span class="strand-end">3′</span></div>
+<div class="strand-row"><span class="strand-label">RNA</span><span class="strand-end">5′</span><div id="mrna-bases" class="strand-bases"></div><span class="strand-end">3′</span></div>
+<div class="strand-row"><span class="strand-label">Amino acids</span><span></span><div id="protein-row" class="strand-proteins"></div><span></span></div>
+</div><p id="peptide-summary" class="peptide-summary"></p>
+<p class="hint">Each full RNA triplet is a codon. A stop codon ends decoding and adds <strong>no amino acid</strong>. Bases before the chosen frame and incomplete final triplets are not decoded. Grey tiles after a stop stay untranslated.</p></section>
+<details class="panel"><summary>Explore the standard genetic code</summary>
+<p>Codons are RNA, read 5′→3′. Activate a codon to highlight other codons with the same amino-acid meaning (or the three stop signals). This standard code is not universal; some organisms and organelles use alternatives. AUG encodes methionine and commonly initiates translation, but initiation depends on context.</p>
+<div class="codon-scroll"><div id="codon-grid" class="codon-table-grid"></div></div>
+<p id="table-status" role="status" aria-live="polite"></p></details>
+<p class="provenance">Adapted from the original bioinformatis-web Central Dogma Translator under Apache 2.0. Modified for Week 1; <a href="../../third_party/bioinformatis-web-LICENSE">upstream license</a>. <a href="https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi#SG1">Standard-code reference: NCBI</a>.</p>
+</main><script src="../_shared/resize.js" defer></script><script>
+(() => {'use strict';
+  const GENETIC_CODE = {
+    UUU:'F', UUC:'F', UUA:'L', UUG:'L',
+    UCU:'S', UCC:'S', UCA:'S', UCG:'S',
+    UAU:'Y', UAC:'Y', UAA:'*', UAG:'*',
+    UGU:'C', UGC:'C', UGA:'*', UGG:'W',
+    CUU:'L', CUC:'L', CUA:'L', CUG:'L',
+    CCU:'P', CCC:'P', CCA:'P', CCG:'P',
+    CAU:'H', CAC:'H', CAA:'Q', CAG:'Q',
+    CGU:'R', CGC:'R', CGA:'R', CGG:'R',
+    AUU:'I', AUC:'I', AUA:'I', AUG:'M',
+    ACU:'T', ACC:'T', ACA:'T', ACG:'T',
+    AAU:'N', AAC:'N', AAA:'K', AAG:'K',
+    AGU:'S', AGC:'S', AGA:'R', AGG:'R',
+    GUU:'V', GUC:'V', GUA:'V', GUG:'V',
+    GCU:'A', GCC:'A', GCA:'A', GCG:'A',
+    GAU:'D', GAC:'D', GAA:'E', GAG:'E',
+    GGU:'G', GGC:'G', GGA:'G', GGG:'G',
+  };
+
+  const AA_THREE = {
+    A:'Ala', R:'Arg', N:'Asn', D:'Asp', C:'Cys',
+    E:'Glu', Q:'Gln', G:'Gly', H:'His', I:'Ile',
+    L:'Leu', K:'Lys', M:'Met', F:'Phe', P:'Pro',
+    S:'Ser', T:'Thr', W:'Trp', Y:'Tyr', V:'Val',
+    '*': 'STOP',
+  };
+
+  const AA_CATEGORY = {
+    A:'hydrophobic', V:'hydrophobic', L:'hydrophobic', I:'hydrophobic',
+    M:'hydrophobic', F:'hydrophobic', W:'hydrophobic', P:'hydrophobic',
+    S:'polar', T:'polar', N:'polar', Q:'polar', Y:'polar', C:'polar',
+    D:'acidic', E:'acidic',
+    K:'basic',  R:'basic',  H:'basic',
+    G:'special',
+    '*':'stop',
+  };
+
+
+const BASES_RNA=['U','C','A','G'];
+const $=id=>document.getElementById(id);
+const codonGrid=$('codon-grid');
+const state={dna:'ATGGCTTTCTAA',frame:0,position:0,playing:false,timer:null,valid:true,highlightAA:null};
+function decodeSequence(dna,frame=0) {
+  if (!/^[ACGT]{3,90}$/.test(dna)) throw new Error('Use 3–90 uppercase A/C/G/T letters only.');
+  if (![0,1,2].includes(frame)) throw new Error('Choose frame +1, +2, or +3.');
+  const rna=dna.replace(/T/g,'U'), codons=[];
+  for(let i=frame;i+2<rna.length;i+=3) codons.push({codon:rna.slice(i,i+3),aa:GENETIC_CODE[rna.slice(i,i+3)],start:i});
+  const stopIndex=codons.findIndex(c=>c.aa==='*');
+  return {rna,codons,stopIndex,steps:stopIndex<0?codons.length:stopIndex+1,
+    peptide:codons.slice(0,stopIndex<0?codons.length:stopIndex).map(c=>c.aa).join(''),
+    trailing:Math.max(0,rna.length-frame)%3};
+}
+function pause(){state.playing=false;if(state.timer!==null)clearInterval(state.timer);state.timer=null;buttons();}
+function buttons(){const end=!state.valid||state.position>=decodeSequence(state.dna,state.frame).steps;
+ $('play-btn').disabled=end||state.playing;$('pause-btn').disabled=!state.playing;$('step-btn').disabled=end;}
+function render(){
+ ['dna-bases','mrna-bases','protein-row'].forEach(id=>$(id).replaceChildren());
+ if(!state.valid){$('status-line').textContent='Sequence is not valid; playback is paused.';$('peptide-summary').textContent='Correct the input to show its decoding.';buttons();renderCurrentCodonInTable(null);return;}
+ const model=decodeSequence(state.dna,state.frame),current=model.codons[state.position-1];
+ for(const [id,seq] of [['dna-bases',state.dna],['mrna-bases',model.rna]]){
+  const parent=$(id);parent.style.setProperty('--n',seq.length);
+  for(let i=0;i<seq.length;i++){const span=document.createElement('span');span.className='base is-'+seq[i];span.textContent=seq[i];
+   if(i<state.frame)span.classList.add('is-offframe');
+   if(i>=state.frame+model.codons.length*3)span.classList.add('is-partial');
+   if(current&&i>=current.start&&i<current.start+3)span.classList.add('is-active');parent.append(span);}}
+ const protein=$('protein-row');protein.style.setProperty('--n',model.rna.length);
+ if(state.frame){const spacer=document.createElement('span');spacer.style.gridColumn='span '+state.frame;protein.append(spacer);}
+ model.codons.forEach((c,i)=>{const tile=document.createElement('div'),seen=i<state.position,after=model.stopIndex>=0&&i>model.stopIndex;
+  tile.className='aa-slot '+(after?'after-stop':seen?'aa-cat-'+AA_CATEGORY[c.aa]:'is-placeholder');
+  if(i===state.position-1)tile.classList.add('is-current');
+  tile.textContent=after?'Not decoded':seen?(c.aa==='*'?'STOP':c.aa+' · '+AA_THREE[c.aa]):'·';
+  tile.title=c.codon+(after?' is downstream of stop':seen?' → '+AA_THREE[c.aa]:' not yet decoded');protein.append(tile);});
+ const shown=model.codons.slice(0,state.position).filter(c=>c.aa!=='*').map(c=>c.aa).join('');
+ $('peptide-summary').textContent='Decoded amino acids: '+(shown||'none yet')+' ('+shown.length+').';
+ const completed=state.position>=model.steps;
+ let text='Frame +'+(state.frame+1)+' (starts at base '+(state.frame+1)+'). Codons processed: '+state.position+'/'+model.steps+'. ';
+ if(current)text+=current.codon+(current.aa==='*'?' is STOP; no amino acid added.': ' → '+AA_THREE[current.aa]+'. ');
+ if(completed&&model.stopIndex<0)text+='End of full codons; no stop codon encountered. ';
+ if(model.trailing)text+=model.trailing+' trailing base(s) form no complete codon. ';
+ if(model.codons[0]&&model.codons[0].codon!=='AUG')text+='This frame does not begin with AUG: hypothetical decoding, not a prediction of initiation. ';
+ if(!model.codons.length)text+='No full codon remains in this frame.';
+ $('status-line').textContent=text;buttons();renderCurrentCodonInTable(current?{...current}:null);
+}
+function advance(){if(!state.valid)return;const model=decodeSequence(state.dna,state.frame);if(state.position>=model.steps)return;
+ state.position++;if(state.position>=model.steps)pause();render();}
+function reset(){pause();state.position=0;render();}
+function play(){if(state.playing||!state.valid||state.position>=decodeSequence(state.dna,state.frame).steps)return;
+ state.playing=true;buttons();state.timer=setInterval(advance,1300-Number($('speed').value)*110);}
+function updateInput(){pause();try{decodeSequence($('seq-input').value,state.frame);state.dna=$('seq-input').value;state.valid=true;$('input-error').textContent='';$('seq-input').setAttribute('aria-invalid','false');}
+ catch(error){state.valid=false;$('input-error').textContent=error.message;$('seq-input').setAttribute('aria-invalid','true');}state.position=0;render();}
+$('seq-input').addEventListener('input',updateInput);
+document.querySelectorAll('[data-sequence]').forEach(button=>button.addEventListener('click',()=>{$('seq-input').value=button.dataset.sequence;document.querySelector('input[name="frame"][value="0"]').checked=true;state.frame=0;updateInput();}));
+document.querySelectorAll('input[name="frame"]').forEach(input=>input.addEventListener('change',()=>{state.frame=Number(input.value);reset();}));
+$('play-btn').addEventListener('click',play);$('pause-btn').addEventListener('click',pause);$('step-btn').addEventListener('click',()=>{pause();advance();});$('reset-btn').addEventListener('click',reset);
+$('speed').addEventListener('input',()=>{if(state.playing){pause();play();}});
+  function buildCodonTable() {
+    // Grid: col 1 = first-base axis label, col 2 = first-base letter,
+    //       cols 3-6 = one cell per second base, col 7 = third-base legend
+    codonGrid.innerHTML = '';
+
+    // Top row: SECOND BASE heading
+    codonGrid.append(gridCell('', 'cth cth-main', { colspan: 2 }));
+    codonGrid.append(gridCell('2nd base', 'cth cth-main', { colspan: 4 }));
+    codonGrid.append(gridCell('3rd', 'cth cth-main'));
+
+    // Second row: axis letters
+    codonGrid.append(gridCell('', 'cth cth-main'));
+    codonGrid.append(gridCell('', 'cth cth-main'));
+    BASES_RNA.forEach((b) => codonGrid.append(gridCell(b, 'cth cth-axis')));
+    codonGrid.append(gridCell('', 'cth cth-main'));
+
+    // Body: one first-base group per row
+    BASES_RNA.forEach((b1, rowIdx) => {
+      if (rowIdx === 0) {
+        // Only render the "1st base" axis label in the first row with rowspan=4
+        const axis = gridCell('1st', 'cth cth-main', { rowspan: 4 });
+        codonGrid.append(axis);
+      }
+      codonGrid.append(gridCell(b1, 'cth cth-axis'));
+      BASES_RNA.forEach((b2) => {
+        const cell = document.createElement('div');
+        cell.className = 'ctc';
+        const inner = document.createElement('div');
+        inner.className = 'codon-cell';
+        BASES_RNA.forEach((b3) => {
+          const codon = b1 + b2 + b3;
+          const aa = GENETIC_CODE[codon];
+          const cat = AA_CATEGORY[aa];
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'codon-btn aa-cat-' + cat + (aa === '*' ? ' is-stop' : '');
+          btn.dataset.codon = codon;
+          btn.dataset.aa = aa;
+          btn.innerHTML = `<span class="codon-letters">${codon}</span><span class="aa-tag">${aa === '*' ? '✕' : aa}</span>`;
+          btn.title = `${codon} → ${AA_THREE[aa]}`;
+          btn.addEventListener('click', () => {
+            state.highlightAA = (state.highlightAA === aa) ? null : aa;
+            applyHighlights();
+            const count=Object.values(GENETIC_CODE).filter(value=>value===aa).length;
+            $('table-status').textContent=state.highlightAA?(aa==='*'?count+' stop codons; stop is not an amino acid.':count+' codons encode '+AA_THREE[aa]+'.'):'Codon highlight cleared.';
+          });
+          inner.appendChild(btn);
+        });
+        cell.appendChild(inner);
+        codonGrid.append(cell);
+      });
+      codonGrid.append(gridCell(BASES_RNA.join(''), 'cth cth-axis cth-axis-3rd', { stack: true }));
+    });
+  }
+
+  function gridCell(text, cls, opts = {}) {
+    const el = document.createElement('div');
+    el.className = cls;
+    if (opts.colspan) el.style.gridColumn = 'span ' + opts.colspan;
+    if (opts.rowspan) el.style.gridRow = 'span ' + opts.rowspan;
+    if (opts.stack) {
+      el.style.display = 'flex';
+      el.style.flexDirection = 'column';
+      el.style.justifyContent = 'space-around';
+      el.style.lineHeight = '1.3';
+      el.textContent = '';
+      text.split('').forEach((ch) => {
+        const r = document.createElement('span');
+        r.textContent = ch;
+        el.appendChild(r);
+      });
+    } else {
+      el.textContent = text;
+    }
+    return el;
+  }
+
+  function applyHighlights() {
+    const aa = state.highlightAA;
+    document.querySelectorAll('.codon-btn').forEach((b) => {
+      b.classList.toggle('is-highlighted', !!aa && b.dataset.aa === aa);
+    });
+  }
+
+  function renderCurrentCodonInTable(current) {
+    document.querySelectorAll('.codon-btn.is-current').forEach((b) => b.classList.remove('is-current'));
+    if (!current) return;
+    const btn = codonGrid.querySelector(`.codon-btn[data-codon="${current.codon}"]`);
+    if (btn) btn.classList.add('is-current');
+  }
+
+
+window.translationLab=Object.freeze({decode:decodeSequence,geneticCode:Object.freeze({...GENETIC_CODE})});
+buildCodonTable();reset();
+})();</script></body></html>

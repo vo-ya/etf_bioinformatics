@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<!-- Adapted from bioinformatis-web, lecture-01/06-fastq-inspector.html.
+Modified for the 2026/2027 Week 1 pilot: offline native table, Phred+33 only,
+strict four-line validation, multiple records, per-base expected errors and trailing-trim controls.
+Apache-2.0; see ../../third_party/bioinformatis-web-LICENSE. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FASTQ Inspector · Week 1</title>
+<link rel="stylesheet" href="../_shared/artifact-theme.css">
+<style>
+body { padding: 2rem; }
+main { max-width: 1100px; margin: auto; }
+h1 { font-size: var(--text-3xl); margin-bottom: .5rem; }
+h2 { font-size: var(--text-xl); margin-bottom: .75rem; }
+p { margin: .6rem 0; }
+header { margin-bottom: 1.5rem; }
+header p, .note { color: var(--fg-muted); }
+.panel { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin: 1.25rem 0; }
+.prompt { border-left: 3px solid var(--accent); background: var(--accent-bg); padding: .75rem 1rem; }
+label { font-weight: 600; display: block; margin: .75rem 0 .4rem; }
+textarea { display: block; width: 100%; min-height: 12rem; resize: vertical; font-family: var(--font-mono); font-size: .95rem; white-space: pre; background: var(--bg-muted); border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: .75rem; }
+button, select, input { padding: .5rem .7rem; border: 1px solid var(--border-strong); background: var(--bg-elevated); border-radius: var(--radius-sm); }
+button { cursor: pointer; }
+button:hover { background: var(--bg-muted); }
+.toolbar { display: flex; flex-wrap: wrap; align-items: end; gap: .6rem; margin-top: .75rem; }
+.toolbar label { margin: 0; }
+.status { border-left: 3px solid var(--success); padding: .6rem .8rem; background: var(--bg-muted); }
+.status.error { border-color: var(--error); color: var(--error); }
+.metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin: 1rem 0; padding: 1rem; background: var(--bg-muted); }
+.metrics dt { color: var(--fg-muted); font-size: var(--text-sm); }
+.metrics dd { font-family: var(--font-mono); margin: .2rem 0 0; font-size: var(--text-xl); }
+.table-wrap { overflow: auto; max-height: 27rem; border: 1px solid var(--border); }
+table { border-collapse: collapse; width: 100%; font-family: var(--font-mono); font-size: var(--text-sm); }
+th, td { padding: .5rem .7rem; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+th { background: var(--bg-muted); position: sticky; top: 0; }
+.low { background: #fff4e5; }
+.eq { font-family: var(--font-mono); background: var(--bg-muted); padding: .8rem; }
+#calc-q { width: 7rem; }
+[hidden] { display: none !important; }
+@media (max-width: 640px) { body { padding: 1rem; } .panel { padding: 1rem; } h1 { font-size: var(--text-2xl); } }
+</style>
+</head>
+<body>
+<main data-artifact="week1-fastq-inspector">
+<header><h1>FASTQ Inspector</h1><p>A read contains a sequence and an estimated error probability for each base call. Decode the quality characters to calculate the expected number of errors.</p></header>
+<aside class="prompt"><strong>Try it:</strong> Compare “Even Q30” and “Weak tail”. Which read has more expected errors? Then load “@ and + are quality characters”. Explain why splitting a file at every @ would fail.</aside>
+<section class="panel">
+<h2>Inspect a small FASTQ sample</h2>
+<p>Modern four-line records only: <code>@identifier</code>, sequence, <code>+</code>, quality. This tool assumes <strong>Phred+33</strong>; the encoding cannot be inferred safely from a short quality string. It accepts A/C/G/T/N sequences and a final newline, but no blank separator lines.</p>
+<label for="fastq-text">Paste records (synthetic examples provided)</label>
+<textarea id="fastq-text" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="validation" maxlength="100000"></textarea>
+<div class="toolbar"><div><label for="example-pick">Example</label><select id="example-pick"><option value="toy">Lesson toy: Q40/Q20/Q10</option><option value="even">Even Q30</option><option value="tail">Weak tail</option><option value="symbols">@ and + are quality characters</option><option value="two">Two records</option><option value="broken">Broken length</option></select></div><button type="button" id="load-btn">Load example</button><button type="button" id="clear-btn">Clear</button></div>
+<label for="fastq-file">Or open a local FASTQ file (up to 100,000 characters; stays in this browser)</label><input id="fastq-file" type="file" accept=".fastq,.fq,.txt"><p id="file-status" role="status"></p>
+<p id="validation" class="status" role="status" aria-live="polite"></p>
+<div id="results" hidden>
+<dl class="metrics"><div><dt>Records</dt><dd id="record-count"></dd></div><div><dt>Total bases</dt><dd id="base-count"></dd></div><div><dt>Expected errors, all records</dt><dd id="all-errors"></dd></div></dl>
+<h2>Try trailing quality trimming</h2>
+<p>From the right end, remove consecutive bases with Q <strong>below</strong> the threshold. Stop at the first Q at or above it. Keep the sequence and quality slices aligned, then discard any read shorter than the minimum. Internal low-quality positions can remain.</p>
+<div class="toolbar"><div><label for="trim-threshold">Q threshold (0–41)</label><input id="trim-threshold" type="number" min="0" max="41" step="1" value="20"></div><div><label for="min-length">Minimum retained length (1–1000)</label><input id="min-length" type="number" min="1" max="1000" step="1" value="6"></div></div>
+<p class="note">Use minimum 6 for the eight-base lesson toy; set <strong>50</strong> for the practical’s 80-base dataset. This is an exercise policy, not a universal rule for biological data.</p>
+<p id="trim-status" role="status" aria-live="polite"></p>
+<div id="trim-results"><div class="table-wrap"><table><caption>Dataset before and after trimming and minimum-length filtering</caption><thead><tr><th scope="col">Measure</th><th scope="col">Before</th><th scope="col">After</th></tr></thead><tbody id="trim-summary"></tbody></table></div><p id="trim-tradeoff"></p><p id="trim-read"></p></div>
+<h2>Inspect the original read</h2>
+<label for="read-pick">Read to inspect</label><select id="read-pick"></select>
+<dl class="metrics"><div><dt>Read length</dt><dd id="read-length"></dd></div><div><dt>Q range</dt><dd id="q-range"></dd></div><div><dt>Expected errors, this read</dt><dd id="read-errors"></dd></div></dl>
+<p id="read-summary"></p>
+<div class="table-wrap"><table><caption>Per-base quality in the selected read</caption><thead><tr><th scope="col">Position (1-based)</th><th scope="col">Base</th><th scope="col">Character</th><th scope="col">ASCII</th><th scope="col">Q</th><th scope="col">Error probability</th></tr></thead><tbody id="base-rows"></tbody></table></div>
+<p class="note" id="table-note"></p>
+</div>
+</section>
+<section class="panel"><h2>Phred calculator</h2><p class="eq">Q = ASCII(character) − 33<br>p(error) = 10<sup>−Q/10</sup><br>Expected errors in a read = Σ p(error at each position)</p>
+<label for="calc-q">Integer Phred score (0–93)</label><input id="calc-q" type="number" min="0" max="93" step="1" value="30"><p id="calc-result" role="status" aria-live="polite"></p>
+<p>Adding 10 to Q divides the estimated error probability by 10: Q10 → 10%, Q20 → 1%, Q30 → 0.1%. These are estimates from the base caller, not proof that a particular base is correct.</p>
+<p><strong>Expected errors is a count, not the probability of an error somewhere in the read.</strong> It can exceed 1. Sum the per-base probabilities; converting a mean Q score back to a probability does not give their arithmetic mean. Summing expectations does not require independent errors.</p>
+<p class="note">Orange rows mark Q &lt; 20. This threshold helps you find uncertain positions; choosing a threshold for an analysis also depends on how much sequence you need to retain. Quality scores alone cannot identify contamination or a mislabeled sample.</p>
+</section>
+</main>
+<script src="../_shared/resize.js" defer></script>
+<script src="fastq-core.js"></script>
+<script>
+(() => {
+  'use strict';
+  const { parseFastq, pError, trimRecord, summarize } = Week1Fastq;
+  const $ = id => document.getElementById(id);
+  const examples = {
+    toy: '@toy_read_01\nACGTACGT\n+\nIIII55++\n',
+    even: '@even_q30\nACGTACGT\n+\n????????',
+    tail: '@weak_tail\nACGTACGT\n+\n????++!!',
+    symbols: '@legal_symbols\nACGT\n+\n@+!?',
+    two: '@read_1\nACGT\n+\n????\n@read_2\nTGCA\n+\n++++',
+    broken: '@broken\nACGT\n+\n???'
+  };
+  let records = [];
+  function decimal(x) { if (x === null) return '— (no retained bases)'; return x === 0 ? '0' : x < 0.0001 ? x.toExponential(3) : Number(x.toPrecision(5)).toString(); }
+  function inspectRead() {
+    const r = records[Number($('read-pick').value) || 0];
+    if (!r) return;
+    renderTrimming();
+    $('read-length').textContent = r.seq.length + ' nt';
+    $('q-range').textContent = `${Math.min(...r.qs)}–${Math.max(...r.qs)}`;
+    $('read-errors').textContent = decimal(r.expectedErrors);
+    $('read-summary').textContent = `${r.header}: these quality estimates imply ${decimal(r.expectedErrors)} errors on average per read with this quality profile. The actual errors in this read are unknown.`;
+    const frag = document.createDocumentFragment();
+    r.qs.slice(0, 500).forEach((q, i) => {
+      const row = document.createElement('tr');
+      if (q < 20) row.className = 'low';
+      [i + 1, r.seq[i], r.quality[i], r.quality.charCodeAt(i), q, `${decimal(r.probabilities[i])} (${decimal(100 * r.probabilities[i])}%)`].forEach(value => {
+        const td = document.createElement('td'); td.textContent = value; row.appendChild(td);
+      });
+      frag.appendChild(row);
+    });
+    $('base-rows').replaceChildren(frag);
+    $('table-note').textContent = r.seq.length > 500 ? 'Showing the first 500 positions; summary calculations use the full read.' : 'Every sequence base has exactly one quality character. Symbols such as @ and + are valid on the quality line.';
+  }
+  function renderTrimming() {
+    if (!records.length) return;
+    const qRaw = $('trim-threshold').value;
+    const minRaw = $('min-length').value;
+    try {
+      if (qRaw === '' || minRaw === '') throw new Error('Enter both a whole-number threshold and minimum length.');
+      const threshold = Number(qRaw), minLength = Number(minRaw);
+      const trimmed = records.map(r => trimRecord(r, threshold, minLength));
+      const retained = trimmed.filter(Boolean);
+      const before = summarize(records), after = summarize(retained);
+      const rows = [['Reads', before.reads, after.reads], ['Bases', before.bases, after.bases],
+        ['Expected errors', decimal(before.expectedErrors), decimal(after.expectedErrors)],
+        ['Expected errors per 1,000 bases', decimal(before.expectedErrorsPer1000), decimal(after.expectedErrorsPer1000)]];
+      $('trim-summary').replaceChildren(...rows.map(values => {
+        const row = document.createElement('tr');
+        values.forEach((v, i) => { const cell = document.createElement(i ? 'td' : 'th'); if (!i) cell.scope = 'row'; cell.textContent = v; row.appendChild(cell); });
+        return row;
+      }));
+      $('trim-status').textContent = `Applied trailing Q < ${threshold} trimming, then minimum length ${minLength}. Discarded ${before.reads - after.reads} of ${before.reads} reads.`;
+      const reduction = before.expectedErrors ? `${decimal(100 * (1 - after.expectedErrors / before.expectedErrors))}%` : 'not defined (zero expected errors before)';
+      $('trim-tradeoff').textContent = `Retained ${decimal(100 * after.bases / before.bases)}% of bases; total expected-error reduction ${reduction}. Compare the error rate per 1,000 bases as well: deleting data lowers the total without automatically improving the remaining evidence.`;
+      const index = Number($('read-pick').value) || 0;
+      const selected = trimmed[index];
+      $('trim-read').textContent = selected ? `Selected read after trimming: ${selected.seq.length} nt, sequence ${selected.seq}, quality ${selected.quality}, expected errors ${decimal(selected.expectedErrors)}.` : 'Selected read is discarded because it is shorter than the minimum after trimming.';
+      $('trim-results').hidden = false;
+    } catch (error) {
+      $('trim-results').hidden = true;
+      $('trim-status').textContent = error.message;
+    }
+  }
+  function render() {
+    const status = $('validation');
+    try {
+      records = parseFastq($('fastq-text').value);
+      status.className = 'status';
+      status.textContent = `Valid in this inspector’s four-line Phred+33 scope: ${records.length} record(s).`;
+      $('fastq-text').setAttribute('aria-invalid', 'false');
+      $('results').hidden = false;
+      $('record-count').textContent = records.length;
+      $('base-count').textContent = records.reduce((s, r) => s + r.seq.length, 0);
+      $('all-errors').textContent = decimal(records.reduce((s, r) => s + r.expectedErrors, 0));
+      const previous = Number($('read-pick').value) || 0;
+      $('read-pick').replaceChildren(...records.map((r, i) => {
+        const option = document.createElement('option'); option.value = i; option.textContent = `${i + 1}. ${r.header}`; return option;
+      }));
+      $('read-pick').value = Math.min(previous, records.length - 1);
+      inspectRead();
+    } catch (error) {
+      records = []; $('results').hidden = true; status.className = 'status error';
+      status.textContent = error.message; $('fastq-text').setAttribute('aria-invalid', 'true');
+    }
+  }
+  function loadExample() { $('fastq-text').value = examples[$('example-pick').value]; render(); }
+  function calculate() {
+    const raw = $('calc-q').value;
+    const q = Number(raw);
+    if (raw === '' || !Number.isInteger(q) || q < 0 || q > 93) {
+      $('calc-result').textContent = 'Enter a whole number from 0 to 93.'; return;
+    }
+    $('calc-result').textContent = `Q${q} → ASCII ${q + 33} → character “${String.fromCharCode(q + 33)}” → estimated error probability ${decimal(pError(q))} (${decimal(100 * pError(q))}%).`;
+  }
+  $('fastq-text').addEventListener('input', render);
+  $('read-pick').addEventListener('change', inspectRead);
+  $('load-btn').addEventListener('click', loadExample);
+  $('example-pick').addEventListener('change', loadExample);
+  $('clear-btn').addEventListener('click', () => { $('fastq-text').value = ''; render(); $('fastq-text').focus(); });
+  $('trim-threshold').addEventListener('input', renderTrimming);
+  $('min-length').addEventListener('input', renderTrimming);
+  $('fastq-file').addEventListener('change', async () => {
+    const file = $('fastq-file').files[0];
+    if (!file) return;
+    try {
+      if (file.size > 100000) throw new Error('Choose a plain-text file no larger than 100,000 bytes. Compressed FASTQ files are not supported.');
+      const text = await file.text();
+      if (text.length > 100000) throw new Error('File exceeds the 100,000-character limit.');
+      $('fastq-text').value = text;
+      $('file-status').textContent = `Opened ${file.name} locally; set minimum length 50 for the practical dataset.`;
+      render();
+    } catch (error) { $('file-status').textContent = error.message; }
+  });
+  $('calc-q').addEventListener('input', calculate);
+  loadExample(); calculate();
+})();
+</script>
+</body>
+</html>

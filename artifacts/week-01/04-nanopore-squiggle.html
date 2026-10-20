@@ -1,0 +1,263 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A schematic nanopore signal — Week 1</title><link rel="stylesheet" href="../_shared/artifact-theme.css">
+<!-- Adapted from bioinformatis-web/artifacts/lecture-01/05-nanopore-squiggle.html.
+Apache-2.0; see ../../third_party/bioinformatis-web-LICENSE.
+Modified for Week 1: explicit schematic units and five-base teaching window;
+strict input validation; reproducible noise and collision-free toy levels;
+correct context/output synchronization, end controls, and local dependencies. -->
+<style>
+    body { padding: 2rem; }
+    .artifact { max-width: 1100px; margin: 0 auto; }
+
+    .artifact-head { margin-bottom: 1.5rem; }
+    .artifact-head h1 {
+      font-family: var(--font-serif);
+      font-size: var(--text-3xl);
+      letter-spacing: -0.02em;
+      margin: 0 0 0.25rem;
+    }
+    .artifact-head p {
+      color: var(--fg-muted);
+      font-size: var(--text-sm);
+      line-height: var(--leading-relaxed);
+      margin: 0;
+      max-width: 60ch;
+    }
+
+    .panel {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .panel-label {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      margin: 0 0 0.85rem;
+      font-weight: 600;
+    }
+    .field-label {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--fg-muted);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .seq-row { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .seq-input {
+      flex: 1;
+      font-family: var(--font-mono);
+      font-size: var(--text-base);
+      letter-spacing: 0.04em;
+      padding: 0.5rem 0.75rem;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      min-width: 0;
+    }
+    .seq-input:focus { background: var(--bg-elevated); border-color: var(--accent-bright); }
+
+    .btn {
+      font-family: var(--font-sans);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      padding: 0.5rem 0.9rem;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--fg);
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn:hover:not(:disabled) { background: var(--bg-inset); border-color: var(--border-strong); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn--primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn--primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem 1.25rem;
+      align-items: flex-end;
+      margin-bottom: 1rem;
+    }
+    .control-field {
+      flex: 1 1 160px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .control-field input[type="range"] { accent-color: var(--accent); }
+    .control-readout {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--fg-muted);
+    }
+    .playback {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .cycle-readout {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      color: var(--fg-muted);
+    }
+
+    /* ─── Pore cartoon ───────────────────────────────────── */
+    .pore-wrap {
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1rem;
+      overflow: hidden;
+    }
+    .pore-svg { width: 100%; height: 180px; display: block; }
+
+    /* Squiggle canvas */
+    .squiggle-wrap {
+      background: #0b0d10;
+      border-radius: var(--radius-sm);
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+    }
+    .squiggle-canvas {
+      width: 100%;
+      height: 200px;
+      display: block;
+    }
+
+    /* Basecaller output */
+    .bc-wrap {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    .bc-row { display: flex; gap: 0.75rem; }
+    .bc-row-label {
+      color: var(--fg-subtle);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      min-width: 5.5rem;
+    }
+    .bc-row.template { border-bottom: 1px dashed var(--border); padding-bottom: 0.3rem; margin-bottom: 0.3rem; }
+    .bc-base.is-A { color: var(--base-a); }
+    .bc-base.is-T { color: var(--base-t); }
+    .bc-base.is-G { color: var(--base-g); }
+    .bc-base.is-C { color: var(--base-c); }
+    .bc-base.miscall {
+      background: #fdd9d5;
+      color: var(--error);
+      font-weight: 700;
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+    .bc-base.window {
+      outline: 1px solid var(--accent);
+      outline-offset: -1px;
+      border-radius: 2px;
+    }
+
+    .hint {
+      font-size: var(--text-xs);
+      color: var(--fg-muted);
+      margin-top: 0.5rem;
+      line-height: var(--leading-relaxed);
+    }
+
+    .example-strip { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.25rem; }
+    .example-strip .btn { font-family: var(--font-mono); font-size: var(--text-xs); padding: 0.35rem 0.65rem; }
+
+    @media (max-width: 720px) {
+      body { padding: 1rem; }
+      .panel { padding: 1rem; }
+      .artifact-head h1 { font-size: var(--text-2xl); }
+    }
+
+body {padding:1.25rem}.artifact {max-width:1000px}.artifact-head p {max-width:85ch}
+.model-note {border-left:3px solid var(--accent);padding:.4rem 1rem;background:var(--accent-bg)}
+.error {color:var(--error);font-weight:600;min-height:1.5em}.hint {font-size:.85rem}
+.status {padding:.75rem;background:var(--bg-muted);border:1px solid var(--border);margin:1rem 0}
+.bc-base {display:inline-block;text-align:center;width:1.1em;padding:0!important}.bc-row-label {min-width:7rem}
+.signal-table {border-collapse:collapse;font-size:.85rem;width:100%}.signal-table th,.signal-table td {padding:.35rem .5rem;border-bottom:1px solid var(--border);text-align:left}
+.table-wrap{overflow:auto;max-height:230px}.provenance{font-size:.75rem;color:var(--fg-muted)}
+@media(max-width:600px){.seq-row{flex-wrap:wrap}}
+</style></head><body><main class="artifact" data-artifact="nanopore-squiggle">
+<header class="artifact-head"><h1>From a pore signal to letters</h1><p>A nanopore senses an electrical signal as DNA moves through it. A computer infers sequence from that signal. Predict what repeated DNA context and added noise do in this deliberately simplified demonstration.</p></header>
+<p class="model-note"><strong>Schematic, not instrument data.</strong> Here a five-base window selects an <em>invented</em> signal level, in arbitrary units. Real sensing context, current levels, movement, and basecalling depend on the chemistry and model; five bases is not a universal rule. The toy decoder treats each window independently. Its mistakes are not a measurement of real sequencing accuracy.</p>
+<section class="panel" aria-label="Simulation controls"><label for="template" class="field-label">Synthetic input DNA (known truth in this simulation)</label>
+<div class="seq-row"><input id="template" class="seq-input" value="GATTACAGATTACAGATTACAGA" spellcheck="false" autocomplete="off" aria-describedby="input-note input-error"></div>
+<p id="input-note" class="hint">Enter 5–60 uppercase A/C/G/T letters. Invalid input stays visible and pauses the simulation; no sequence is silently substituted.</p><p id="input-error" class="error" role="alert"></p>
+<div class="example-strip"><button class="btn" type="button" data-ex="GATTACAGATTACAGATTACAGA">Mixed DNA</button><button class="btn" type="button" data-ex="AAAAAAAAAAAAAATTTTTT">Long A run</button><button class="btn" type="button" data-ex="ACGTACGTACGTACGTACGT">Repeating ACGT</button></div>
+<div class="controls" style="margin-top:1rem"><div class="control-field"><label for="speed" class="field-label">Playback speed</label><input id="speed" type="range" min="1" max="10" value="5"><output id="speed-read" for="speed">5</output></div>
+<div class="control-field"><label for="noise" class="field-label">Added noise (arbitrary units)</label><input id="noise" type="range" min="0" max="5" step="0.5" value="0"><output id="noise-read" for="noise">0.0</output></div>
+<div class="playback"><button id="play-btn" class="btn btn--primary" type="button">▶ Play</button><button id="pause-btn" class="btn" type="button" disabled>Pause</button><button id="step-btn" class="btn" type="button">Step one window</button><button id="reset-btn" class="btn" type="button">Reset</button></div></div>
+<p class="hint">Keyboard: Tab reaches controls; Enter or Space activates a button. Arrow keys change focused sliders. Changing noise restarts the run for a consistent comparison.</p></section>
+<div id="position-readout" class="status" role="status" aria-live="polite" aria-atomic="true"></div>
+<section class="panel"><p class="panel-label">Illustrative five-base sensing context</p><div class="pore-wrap"><svg id="pore-svg" class="pore-svg" viewBox="0 0 800 180" role="img" aria-label="Illustrative DNA window; a diagram of context, not pore geometry"></svg></div><p class="hint">Overlapping windows share four letters. Identical five-base contexts have identical nominal levels in this toy model, while added noise changes the samples. The drawing shows sequence context, not the physical geometry of a pore.</p></section>
+<section class="panel"><p class="panel-label">Simulated signal, arbitrary units</p><div class="squiggle-wrap"><canvas id="squiggle" class="squiggle-canvas" width="1000" height="200" role="img" aria-label="Simulated signal trace; the table below provides the numeric values"></canvas></div><p class="hint">Pale blue: invented nominal levels. Bright blue: noisy samples. Time is a sequence of equally sized teaching windows, not measured dwell times.</p><div class="table-wrap"><table class="signal-table"><caption>Completed windows and their signal means</caption><thead><tr><th>Window</th><th>Context</th><th>Nominal</th><th>Sample mean</th><th>Toy center call</th></tr></thead><tbody id="signal-rows"></tbody></table></div></section>
+<section class="panel"><p class="panel-label">Toy calls compared with known input</p><div id="bc-wrap" class="bc-wrap"></div><p id="bc-hint" class="hint"></p><p class="hint">The toy decoder selects the closest nominal level among all 1,024 possible five-base strings, then reports only its center letter. Dots at the first and last two positions are outside the toy's full-window coverage. Real basecallers use a richer signal/context model and infer the sequence jointly.</p></section>
+<p class="provenance">Adapted from the original bioinformatis-web Nanopore Squiggle Decoder under Apache 2.0; modified for Week 1. <a href="../../third_party/bioinformatis-web-LICENSE">Upstream license</a>. Scientific context: <a href="https://nanoporetech.com/platform/technology/basecalling">Oxford Nanopore basecalling</a>.</p>
+</main><script src="../_shared/resize.js" defer></script><script>(()=>{'use strict';
+
+const K=5,LOW=60,HIGH=120,SAMPLES=8;
+const $=id=>document.getElementById(id),state={template:'GATTACAGATTACAGATTACAGA',position:0,levels:[],playing:false,timer:null,valid:true,noise:0};
+function validate(sequence){if(!/^[ACGT]{5,60}$/.test(sequence))throw new Error('Use 5–60 uppercase A/C/G/T letters only.');return sequence;}
+function nominal(kmer){let index=0;for(const base of kmer)index=index*4+'ACGT'.indexOf(base);return LOW+((index*613+97)%1024)/1023*(HIGH-LOW);}
+const models=[];function enumerate(prefix){if(prefix.length===K){models.push([prefix,nominal(prefix)]);return;}for(const base of 'ACGT')enumerate(prefix+base);}enumerate('');
+function basecall(measured){let best=models[0],distance=Infinity;for(const item of models){const d=Math.abs(item[1]-measured);if(d<distance){best=item;distance=d;}}return best[0][2];}
+function gaussian(windowIndex,sampleIndex){let seed=(12345+windowIndex*9781+sampleIndex*6271)>>>0;function uniform(){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return(seed+1)/4294967297;}return Math.sqrt(-2*Math.log(uniform()))*Math.cos(2*Math.PI*uniform());}
+function windowResult(sequence,index,noise){validate(sequence);if(!Number.isInteger(index)||index<0||index>sequence.length-K)throw new Error('Window index is outside the sequence.');
+ if(!Number.isFinite(noise)||noise<0||noise>5)throw new Error('Noise must be between 0 and 5.');
+ const kmer=sequence.slice(index,index+K),expected=nominal(kmer),samples=Array.from({length:SAMPLES},(_,sample)=>expected+noise*gaussian(index,sample)),mean=samples.reduce((a,b)=>a+b,0)/SAMPLES;
+ return{kmer,expected,samples,mean,call:basecall(mean),truth:kmer[2]};}
+function count(){return state.template.length-K+1;}
+function pause(){state.playing=false;if(state.timer!==null)clearInterval(state.timer);state.timer=null;buttons();}
+function buttons(){const end=!state.valid||state.position>=count();$('play-btn').disabled=state.playing||end;$('pause-btn').disabled=!state.playing;$('step-btn').disabled=end;}
+function shownIndex(){return Math.max(0,state.position-1);}
+function renderContext(){const index=shownIndex(),kmer=state.template.slice(index,index+K);let svg='<rect x="280" y="35" width="240" height="110" rx="14" fill="#eef2ff" stroke="#1e3a8a"/><text x="400" y="58" text-anchor="middle" font-size="14" fill="#1e3a8a">toy sensing context</text>';
+ const color={A:'#c4342c',C:'#2d7a3e',G:'#b45309',T:'#0d7377'};
+ for(let i=0;i<K;i++){const x=320+i*40;svg+=`<circle cx="${x}" cy="94" r="16" fill="${color[kmer[i]]}"/><text x="${x}" y="100" text-anchor="middle" font-family="monospace" font-size="18" fill="white">${kmer[i]}</text>`;}
+ svg+=`<text x="400" y="132" text-anchor="middle" font-size="13">input positions ${index+1}–${index+K} (1-based)</text><text x="255" y="97" text-anchor="end" font-family="monospace" font-size="18">${state.template.slice(Math.max(0,index-8),index)}</text><text x="545" y="97" font-family="monospace" font-size="18">${state.template.slice(index+K,index+K+8)}</text>`;$('pore-svg').innerHTML=svg;}
+function renderSignal(){const canvas=$('squiggle'),ratio=window.devicePixelRatio||1,w=canvas.clientWidth||900,h=canvas.clientHeight||200;canvas.width=w*ratio;canvas.height=h*ratio;const ctx=canvas.getContext('2d');ctx.setTransform(ratio,0,0,ratio,0,0);ctx.fillStyle='#0b0d10';ctx.fillRect(0,0,w,h);
+ const left=52,right=12,top=14,bottom=30,plotW=w-left-right,plotH=h-top-bottom;const allSamples=state.levels.flatMap(level=>level.samples),minimum=Math.min(52,...allSamples),maximum=Math.max(128,...allSamples);const y=value=>top+(maximum-value)/(maximum-minimum)*plotH;
+ ctx.font='11px monospace';ctx.fillStyle='#ddd';ctx.textAlign='right';for(const value of [60,80,100,120]){ctx.fillText(value,left-7,y(value)+4);ctx.strokeStyle='#333';ctx.beginPath();ctx.moveTo(left,y(value));ctx.lineTo(w-right,y(value));ctx.stroke();}
+ ctx.textAlign='left';ctx.fillText('toy time / completed windows →',left,h-8);
+ if(!state.levels.length)return;const width=plotW/count();
+ ctx.strokeStyle='#c2d8ff';ctx.lineWidth=2;for(let index=0;index<state.levels.length;index++){ctx.beginPath();ctx.moveTo(left+index*width,y(state.levels[index].expected));ctx.lineTo(left+(index+1)*width,y(state.levels[index].expected));ctx.stroke();}
+ ctx.strokeStyle='#60a5fa';ctx.lineWidth=1.3;ctx.beginPath();state.levels.forEach((level,index)=>level.samples.forEach((sample,offset)=>{const x=left+(index+offset/SAMPLES)*width;if(index===0&&offset===0)ctx.moveTo(x,y(sample));else ctx.lineTo(x,y(sample));}));ctx.stroke();}
+function renderCalls(){const wrapper=$('bc-wrap');wrapper.replaceChildren();for(const kind of ['Input DNA','Toy calls']){const row=document.createElement('div');row.className='bc-row';const label=document.createElement('span');label.className='bc-row-label';label.textContent=kind;row.append(label);
+ const seq=document.createElement('span');for(let i=0;i<state.template.length;i++){const span=document.createElement('span'),level=state.levels[i-2];span.className='bc-base';span.textContent=kind==='Input DNA'?state.template[i]:level?level.call:'·';if(kind==='Toy calls'&&level&&level.call!==state.template[i])span.classList.add('miscall');if(kind==='Input DNA'&&i>=shownIndex()&&i<shownIndex()+K)span.classList.add('window');seq.append(span);}row.append(seq);wrapper.append(row);}
+ const wrong=state.levels.filter(level=>level.call!==level.truth).length;$('bc-hint').textContent='Toy mismatches: '+wrong+' of '+state.levels.length+' center calls. '+(/(.)\1{4,}/.test(state.template)?'A long identical-base run repeats the same nominal level; its samples can still be noisy. This toy uses fixed movement and cannot demonstrate real run-length inference.':'Compare the same input at zero noise and then added noise. These are toy-model results, not instrument accuracy.');}
+function renderTable(){const body=$('signal-rows');body.replaceChildren();state.levels.forEach((level,index)=>{const row=document.createElement('tr');for(const value of [index+1,level.kmer,level.expected.toFixed(3),level.mean.toFixed(3),level.call]){const td=document.createElement('td');td.textContent=value;row.append(td);}body.append(row);});}
+function render(){buttons();if(!state.valid){$('pore-svg').replaceChildren();$('signal-rows').replaceChildren();$('bc-wrap').replaceChildren();$('bc-hint').textContent='Correct the input to create a new signal.';$('position-readout').textContent='Invalid sequence; simulation paused.';renderSignal();return;}
+ renderContext();renderSignal();renderCalls();renderTable();let message='Completed windows: '+state.position+'/'+count()+'. Noise '+state.noise.toFixed(1)+' arbitrary units. ';
+ if(state.levels.length){const last=state.levels.at(-1);message+='Shown context '+last.kmer+', nominal '+last.expected.toFixed(3)+', sample mean '+last.mean.toFixed(3)+'. ';}
+ if(state.position===count())message+='Run complete. Reset to repeat.';$('position-readout').textContent=message;}
+function advance(){if(!state.valid||state.position>=count())return;state.levels.push(windowResult(state.template,state.position,state.noise));state.position++;if(state.position>=count())pause();render();}
+function reset(){pause();state.position=0;state.levels=[];render();}
+function play(){if(state.playing||!state.valid||state.position>=count())return;state.playing=true;buttons();state.timer=setInterval(advance,1100-Number($('speed').value)*90);}
+function updateInput(){pause();try{state.template=validate($('template').value);state.valid=true;$('input-error').textContent='';$('template').setAttribute('aria-invalid','false');}catch(error){state.valid=false;$('input-error').textContent=error.message;$('template').setAttribute('aria-invalid','true');}reset();}
+$('template').addEventListener('input',updateInput);document.querySelectorAll('[data-ex]').forEach(button=>button.addEventListener('click',()=>{$('template').value=button.dataset.ex;updateInput();}));
+$('play-btn').addEventListener('click',play);$('pause-btn').addEventListener('click',pause);$('step-btn').addEventListener('click',()=>{pause();advance();});$('reset-btn').addEventListener('click',reset);
+$('speed').addEventListener('input',()=>{$('speed-read').textContent=$('speed').value;if(state.playing){pause();play();}});
+$('noise').addEventListener('input',()=>{state.noise=Number($('noise').value);$('noise-read').textContent=state.noise.toFixed(1);reset();});window.addEventListener('resize',renderSignal);
+window.nanoporeLab=Object.freeze({windowResult,nominal,basecall});render();
+})();</script></body></html>

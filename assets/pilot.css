@@ -1,0 +1,68 @@
+/* Week-one additions to the inherited bioinformatis-web design. */
+.pilot-home { max-width: 1040px; margin: auto; padding: 4rem 2rem; }
+.pilot-home h1 { font-size: clamp(2.3rem, 6vw, 4rem); max-width: 16ch; margin: .6rem 0 1.2rem; }
+.eyebrow { font-size: .75rem; letter-spacing: .15em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+.lede { font-family: var(--font-serif); font-size: 1.35rem; max-width: 55ch; color: var(--fg-muted); }
+.pilot-card { padding: 2rem; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-elevated); margin: 2.5rem 0; }
+.pilot-card h2 { font-size: 1.9rem; margin: .5rem 0 1rem; }
+.actions { display: flex; gap: .75rem; flex-wrap: wrap; margin: 1.25rem 0; }
+.button { display: inline-flex; align-items: center; justify-content: center; padding: .65rem 1rem; border: 1px solid var(--border-strong); border-radius: 4px; font: 500 .9rem var(--font-sans); color: var(--accent); background: var(--bg-elevated); text-decoration: none; }
+.button.primary { background: var(--accent); border-color: var(--accent); color: white; }
+.button:hover { text-decoration: none; border-color: var(--accent); }
+.muted, .timing { color: var(--fg-muted); font-size: .875rem; }
+.lecture-title { font-size: clamp(2.1rem, 4vw, 3.1rem); }
+.lecture-subtitle { font-size: 1.35rem; margin-top: 1rem; }
+.lecture-meta { gap: .6rem 1.25rem; }
+.lecture-prose { font-size: 1.05rem; }
+.lecture-prose section { scroll-margin-top: 1.5rem; }
+.lecture-prose .objectives ol { font-size: 1rem; }
+.lecture-prose .objectives-heading { font: 600 .75rem var(--font-sans); letter-spacing: .16em; margin: 0 0 .75rem; text-transform: uppercase; color: var(--accent); }
+.lecture-prose details { border: 1px solid var(--border); border-radius: 4px; padding: .8rem 1rem; margin: 1rem 0 1.75rem; background: var(--bg-elevated); }
+.lecture-prose summary { cursor: pointer; color: var(--accent); font-weight: 500; }
+.lecture-prose details[open] summary { margin-bottom: .75rem; }
+.lecture-prose details > :last-child { margin-bottom: 0; }
+.table-scroll { overflow-x: auto; margin: 1.25rem 0; }
+.table-scroll table { margin: 0; }
+.table-scroll caption { text-align: left; color: var(--fg-muted); font-size: .875rem; padding-bottom: .75rem; }
+.lecture-prose td, .lecture-prose th { vertical-align: top; }
+.flow { display: flex; flex-wrap: wrap; gap: .6rem; padding: 1.4rem; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-elevated); align-items: center; }
+.flow > div { flex: 1 1 140px; padding: .75rem; border-left: 3px solid var(--accent); }
+.flow strong { display: block; }
+.flow small { color: var(--fg-muted); }
+.flow .arrow { color: var(--accent); font-size: 1.25rem; }
+.sequence-example { padding: 1.1rem; background: var(--bg-muted); border: 1px solid var(--border); border-radius: 4px; }
+.sequence-example p { margin: .4rem 0; }
+.sequence-example code { white-space: nowrap; background: transparent; }
+.fastq-example { display: grid; grid-template-columns: auto 1fr; gap: .25rem 1.25rem; padding: 1rem; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-elevated); }
+.fastq-example code { background: var(--bg-muted); white-space: nowrap; }
+.fastq-example span { color: var(--fg-muted); font-size: .9rem; }
+.artifact-frame { display: block; width: 100%; border: 1px solid var(--border); border-radius: 6px; margin: 1rem 0 .5rem; background: var(--bg-elevated); }
+.artifact-link { font-size: .875rem; text-align: right; }
+.equation { text-align: center; font: 1.15rem var(--font-mono); background: var(--bg-muted); border-radius: 4px; padding: 1.2rem .7rem; overflow-x: auto; }
+.checkpoint { padding: 1rem 1.25rem; border-left: 3px solid var(--accent); background: var(--accent-bg); margin: 1.5rem 0; }
+.checkpoint > :last-child { margin-bottom: 0; }
+.resource-list li { margin-bottom: .8rem; }
+.page-footer { border-top: 1px solid var(--border); padding-top: 1.5rem; margin-top: 3rem; font-size: .875rem; color: var(--fg-muted); }
+.mobile-contents { display: none; }
+.teaching-sheet { max-width: 850px; margin: auto; padding: 3rem 1.5rem 5rem; }
+.teaching-sheet h1 { font-size: 2.5rem; margin: 1rem 0; }
+.teaching-sheet h2 { font-size: 1.7rem; margin-top: 2.5rem; }
+.teaching-sheet table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.teaching-sheet td, .teaching-sheet th { padding: .65rem; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+@media (max-width: 900px) {
+  .lecture-page { display: block; padding: 1.5rem 1.25rem 4rem; }
+  .lecture-toc-desktop { display: none; }
+  .mobile-contents { display: block; }
+  .fastq-example { grid-template-columns: 1fr; }
+  .fastq-example span { margin-bottom: .6rem; }
+  .pilot-home { padding: 2.5rem 1.25rem; }
+  .pilot-card { padding: 1.4rem; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+@media print {
+  .lecture-toc, .mobile-contents, .scroll-progress, .artifact-frame, .actions { display: none !important; }
+  .lecture-page { display: block; max-width: none; padding: 0; }
+  .lecture-prose, .lecture-header { max-width: none; }
+  details { break-inside: avoid; }
+  a { color: inherit; text-decoration: underline; }
+}

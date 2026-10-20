@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 560" role="img" aria-labelledby="t d">
+  <title id="t">Prepared libraries, technical copies, and paired reads</title>
+  <desc id="d">A schematic short-read library has a sample-derived DNA insert between added adapters. A read extending beyond a short insert can include the opposite adapter. Optional PCR creates technical copies of a starting fragment, not independent biological replicates. Two paired reads come from opposite ends of the same fragment; each output is written five-prime to three-prime. In the illustrated 500-base insert with two 150-base reads, 200 central bases remain unsequenced. Drawings are not to scale.</desc>
+  <!-- Adapted from bioinformatis-web/diagrams/lecture-01/09-adapter-structure.svg
+       and the paired-end teaching idea in diagrams/lecture-03/03-read-types.svg.
+       Apache-2.0; see ../../third_party/bioinformatis-web-LICENSE.
+       Modified for the Week 1 introduction: generic adapter/insert segments,
+       explicit not-to-scale scope, adapter read-through, optional PCR lineage,
+       both read outputs 5-prime to 3-prime, and an unsequenced middle.
+       The source's mixed-scale technology comparison and accuracy claims are omitted. -->
+  <defs>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#1e3a8a"/></marker>
+    <marker id="arrow-rust" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#a04c29"/></marker>
+    <marker id="arrow-gray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#526071"/></marker>
+  </defs>
+  <rect width="1100" height="560" fill="#fcfcfa"/>
+  <g font-family="system-ui, sans-serif" fill="#14243b">
+    <text x="36" y="31" font-size="19" font-weight="650">1 / A prepared library adds known DNA sequences</text>
+    <text x="1064" y="31" font-size="13" fill="#526071" text-anchor="end">Short-read example · not to scale</text>
+    <rect x="60" y="60" width="180" height="38" rx="5" fill="#dbe3f5"/>
+    <rect x="240" y="60" width="600" height="38" fill="#d9eeec"/>
+    <rect x="840" y="60" width="200" height="38" rx="5" fill="#dbe3f5"/>
+    <rect x="60" y="60" width="980" height="38" rx="5" fill="none" stroke="#aebcc6"/>
+    <text x="150" y="85" text-anchor="middle" font-size="17">Added adapter</text>
+    <text x="540" y="85" text-anchor="middle" font-size="17" font-weight="600" fill="#0d7377">Sample-derived DNA insert</text>
+    <text x="940" y="85" text-anchor="middle" font-size="17">Added adapter</text>
+    <text x="60" y="122" font-size="15" fill="#526071">Adapters supply instrument attachment and sequencing-primer sites; details depend on the protocol.</text>
+    <path d="M245 145H927" stroke="#a04c29" stroke-width="3" marker-end="url(#arrow-rust)"/>
+    <line x1="840" x2="840" y1="135" y2="155" stroke="#526071" stroke-dasharray="3 3"/>
+    <text x="245" y="170" font-size="16" fill="#a04c29">Read-through: a read can pass a short insert and enter the opposite adapter.</text>
+
+    <rect x="36" y="198" width="448" height="304" rx="7" fill="#f1f4f5" stroke="#d9e0e5"/>
+    <text x="56" y="229" font-size="19" font-weight="650">2 / PCR can copy a fragment</text>
+    <text x="56" y="253" font-size="15" fill="#526071">Amplification is optional in library preparation.</text>
+    <rect x="72" y="299" width="132" height="14" rx="3" fill="#0d7377"/>
+    <text x="138" y="337" text-anchor="middle" font-size="15">One original fragment</text>
+    <path d="M218 306H300" stroke="#526071" stroke-width="2" marker-end="url(#arrow-gray)"/>
+    <text x="258" y="288" text-anchor="middle" font-size="15">PCR</text>
+    <g fill="#0d7377"><rect x="319" y="274" width="132" height="14" rx="3"/><rect x="319" y="299" width="132" height="14" rx="3"/><rect x="319" y="324" width="132" height="14" rx="3"/></g>
+    <text x="385" y="368" text-anchor="middle" font-size="15">Technical copies</text>
+    <text x="56" y="409" font-size="17" font-weight="600">More observations of the same origin.</text>
+    <text x="56" y="440" font-size="16" fill="#526071">PCR does not grow new independent cultures.</text>
+    <text x="56" y="473" font-size="16" fill="#526071">Copy count ≠ biological-replicate count.</text>
+
+    <rect x="510" y="198" width="554" height="304" rx="7" fill="#f1f4f5" stroke="#d9e0e5"/>
+    <text x="530" y="229" font-size="19" font-weight="650">3 / A read pair samples one fragment</text>
+    <text x="530" y="253" font-size="15" fill="#526071">Example: 500 bp insert, two 150 bp reads.</text>
+    <rect x="558" y="324" width="460" height="15" rx="3" fill="#d9eeec" stroke="#0d7377"/>
+    <path d="M566 301H704" stroke="#1e3a8a" stroke-width="4" marker-end="url(#arrow-blue)"/>
+    <text x="560" y="286" font-size="15" fill="#1e3a8a">5′</text><text x="707" y="286" font-size="15" fill="#1e3a8a">3′</text>
+    <text x="619" y="281" text-anchor="middle" font-size="16" fill="#1e3a8a">Mate 1</text>
+    <path d="M1011 365H872" stroke="#a04c29" stroke-width="4" marker-end="url(#arrow-rust)"/>
+    <text x="1012" y="389" font-size="15" fill="#a04c29">5′</text><text x="860" y="389" font-size="15" fill="#a04c29">3′</text>
+    <text x="944" y="391" text-anchor="middle" font-size="16" fill="#a04c29">Mate 2</text>
+    <line x1="714" y1="331" x2="864" y2="331" stroke="#526071" stroke-width="3" stroke-dasharray="5 5"/>
+    <text x="789" y="417" text-anchor="middle" font-size="17" font-weight="600">200 bp in the middle are not read.</text>
+    <text x="530" y="449" font-size="16" fill="#526071">Both outputs are 5′→3′, in opposite orientations.</text>
+    <text x="530" y="477" font-size="16" fill="#526071">Two mates ≠ one continuous 300 bp read.</text>
+    <text x="36" y="540" font-size="19" font-weight="600">One original fragment → PCR copies → read pairs. No new biological replicates.</text>
+  </g>
+</svg>
