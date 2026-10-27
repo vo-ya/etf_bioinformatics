@@ -1,8 +1,8 @@
 # Bioinformatics for Engineers
 
-A ten-week introductory course for engineering students. **Week 1 is published**:
-the lesson, a 29-slide browser presentation, interactive activities, Colab
-homework, and an instructor guide. Later weeks will be published separately.
+A ten-week introductory course for engineering students. **Weeks 1 and 2 are published**,
+with lessons, browser presentations, interactive activities, Colab homework,
+and instructor guides. Later weeks will be published separately.
 
 ## Week 1: Reading life as data
 
@@ -35,6 +35,35 @@ a live Phred score control with the equation Q = −10 log₁₀(p_error).
 Two identical toy reads with different quality scores connect class to homework.
 These reads and the synthetic homework dataset are independent illustrations;
 they do not provide experimental evidence about either fictional culture.
+
+## Week 2: Sequence alignment and search
+
+- [Student lesson](weeks/week-02.html)
+- [32-slide presentation](presentations/week-02/index.html)
+- [Homework in Colab](https://colab.research.google.com/github/vo-ya/etf_bioinformatics/blob/main/practicals/week-02/exercise.ipynb)
+- [Download student notebook](practicals/week-02/exercise.ipynb)
+- [Instructor notebook](practicals/week-02/solutions.ipynb)
+- [Teaching guide](teaching/week-02.html)
+
+Find every exact placement, compare gapped alignments, distinguish global,
+local, and fitting objectives, and interpret sequence-search results. The deck
+includes a worked dynamic-programming cell, candidate-window cost comparison,
+and a graphical explanation of query coverage versus average read depth.
+Seven interactive activities use small synthetic examples. Timing labels and
+the break slide are omitted from the deck; instructor pacing stays in the guide.
+
+The homework scaffolds exact search, aligned-pair scoring, and a global score
+table with supplied traceback. It needs only the Python standard library.
+Edit [the generator](practicals/week-02/build_notebook.py), then rebuild both
+notebook editions. See the [presentation guide](presentations/week-02/README.md)
+and [homework guide](practicals/week-02/README.md) for scope and verification.
+
+```sh
+python3 practicals/week-02/build_notebook.py
+python3 -m unittest discover -s tests -p 'test_week02_practical.py'
+node tests/test_week02_tools.js
+python3 scripts/check_pilot.py
+```
 
 ## Homework and authoring
 

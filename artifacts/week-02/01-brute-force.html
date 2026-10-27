@@ -1,0 +1,184 @@
+<!doctype html>
+<!-- Adapted from bioinformatis-web/artifacts/lecture-02/01-brute-force.html, Apache-2.0.
+Modified for Week 2: offline fonts, verified examples, corrected validation and accessible controls.
+Original visual layout and interactive teaching pattern retained.
+See README.md and ../../third_party/bioinformatis-web-LICENSE. -->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sliding exact search · Week 2</title><link rel="stylesheet" href="../_shared/artifact-theme.css"><style>
+    body { padding: 2rem; }
+    .artifact { max-width: 1100px; margin: 0 auto; }
+
+    .artifact-head { margin-bottom: 1.5rem; }
+    .artifact-head h1 {
+      font-family: var(--font-serif);
+      font-size: var(--text-3xl);
+      letter-spacing: -0.02em;
+      margin: 0 0 0.25rem;
+    }
+    .artifact-head p {
+      color: var(--fg-muted);
+      font-size: var(--text-sm);
+      line-height: var(--leading-relaxed);
+      margin: 0;
+      max-width: 60ch;
+    }
+
+    .panel {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .panel-label {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      margin: 0 0 0.85rem;
+      font-weight: 600;
+    }
+
+    .field-label {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--fg-muted);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+    .seq-input, textarea.seq-input {
+      width: 100%;
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      padding: 0.55rem 0.75rem;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+    .seq-input:focus { background: var(--bg-elevated); border-color: var(--accent-bright); }
+
+    .btn {
+      font-family: var(--font-sans);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      padding: 0.5rem 0.9rem;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--fg);
+      cursor: pointer;
+    }
+    .btn:hover:not(:disabled) { background: var(--bg-inset); border-color: var(--border-strong); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn--primary {
+      background: var(--accent); color: #fff; border-color: var(--accent);
+    }
+    .btn--primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+    .controls {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .controls label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: var(--text-sm);
+      color: var(--fg-muted);
+    }
+    .controls input[type="range"] { accent-color: var(--accent); width: 120px; }
+
+    /* Alignment visual */
+    .align-view {
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.25rem;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: var(--text-base);
+      line-height: 1.4;
+      letter-spacing: 0.05em;
+      min-height: 120px;
+    }
+    .align-row { white-space: pre; position: relative; }
+    .align-row .ref-base { color: var(--fg); }
+    .align-row .ref-base.compared { background: #eef2ff; border-radius: 2px; }
+    .align-row .query-base { color: var(--accent); font-weight: 600; }
+    .align-row .query-base.match    { background: #d9edd9; color: var(--success); border-radius: 2px; }
+    .align-row .query-base.mismatch { background: #fdd9d5; color: var(--error);   border-radius: 2px; }
+    .align-row .query-base.pending  { opacity: 0.55; }
+
+    .status-line {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      padding: 0.85rem 1rem;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-top: 1rem;
+    }
+    .status-line .label {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      font-weight: 600;
+    }
+    .status-line .value {
+      font-family: var(--font-mono);
+      font-size: var(--text-lg);
+      color: var(--fg);
+      margin-top: 0.15rem;
+    }
+    .status-line .value.emphasis { color: var(--accent); }
+
+    .matches {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      margin-top: 0.75rem;
+      color: var(--fg);
+    }
+    .matches-none { color: var(--fg-subtle); font-style: italic; }
+
+    .hint {
+      font-size: var(--text-xs);
+      color: var(--fg-muted);
+      margin-top: 0.5rem;
+      line-height: var(--leading-relaxed);
+    }
+
+    @media (max-width: 720px) {
+      body { padding: 1rem; }
+      .panel { padding: 1rem; }
+      .artifact-head h1 { font-size: var(--text-2xl); }
+    }
+
+[hidden]{display:none!important} .prompt{border-left:3px solid var(--accent);padding:.7rem 1rem;background:var(--accent-bg);margin:1rem 0} .error{color:var(--error)} pre{overflow-x:auto;white-space:pre} button,input,select{max-width:100%} .hint{font-size:.85rem;color:var(--fg-muted)} </style></head><body>
+<main class="artifact" data-artifact="week2-brute-force"><header class="artifact-head"><h1>Watch an exact search</h1><p>Each step tests one possible start in the reference. Continue after a hit to find overlapping matches and repeated sequences.</p></header>
+<p class="prompt"><strong>Predict (2 minutes):</strong> How many copies of ATGCCA occur? Then try the overlap example. Does exiting on a mismatch change the answers, or only the work?</p>
+<section class="panel"><label class="field-label" for="ref-input">Reference (1–60 A/C/G/T bases)</label><textarea id="ref-input" class="seq-input" rows="2" maxlength="60" spellcheck="false">ATGCCATGACCTATGCCA</textarea><label class="field-label" for="query-input">Query (1–20 bases; forward strand only)</label><input id="query-input" class="seq-input" maxlength="20" spellcheck="false" value="ATGCCA">
+<div class="controls" style="margin-top:1rem"><button id="play-btn" class="btn btn--primary" type="button">Play</button><button id="pause-btn" class="btn" type="button" disabled>Pause</button><button id="step-btn" class="btn" type="button">Step one start</button><button id="reset-btn" class="btn" type="button">Reset</button><label>Speed <input id="speed" type="range" min="1" max="10" value="6"></label><label><input id="early-exit" type="checkbox" checked> Exit at first mismatch</label></div><div class="controls" style="margin-top:.7rem"><button id="overlap-btn" class="btn" type="button">Overlap example: AAA in AAAAA</button><button id="lesson-btn" class="btn" type="button">Lesson example</button></div><p id="validation" role="status" aria-live="polite"></p></section>
+<section class="panel"><p class="panel-label">Reference and tested window · starts are zero-based</p><div id="align-view" class="align-view"></div><div class="status-line"><div><p class="label">Last tested start</p><p id="stat-position" class="value">—</p></div><div><p class="label">Base comparisons</p><p id="stat-comparisons" class="value emphasis">0</p></div><div><p class="label">Windows tested / total</p><p id="stat-windows" class="value">0</p></div><div><p class="label">Exact matches</p><p id="stat-matches" class="value">0</p></div></div><p id="match-list" class="matches"></p><p id="step-status" role="status" aria-live="polite"></p><p class="hint">Green means a tested match; red means a tested mismatch; dim letters have not been compared in this step. The displayed window is the one just tested. The comparison count includes tested matches and mismatches. Only exact matches are reported; gaps are not allowed.</p></section></main>
+<script src="alignment-core.js"></script><script src="../_shared/resize.js" defer></script><script>
+
+(() => {
+'use strict'; const $=id=>document.getElementById(id),core=Week2Alignment;
+let state={},timer=null;
+function stop(){if(timer!==null){clearInterval(timer);timer=null;} buttons();}
+function buttons(){const done=!state.valid||state.next>=state.total;$('play-btn').disabled=done||timer!==null;$('pause-btn').disabled=timer===null;$('step-btn').disabled=done;}
+function reset(){stop();try{const ref=core.dna($('ref-input').value),query=core.dna($('query-input').value);if(query.length>20)throw new Error('Keep the query to 20 bases or fewer.');state={ref,query,next:0,last:null,compared:0,comparisons:0,hits:[],total:Math.max(0,ref.length-query.length+1),valid:true};$('validation').textContent='';$('validation').className='';render();}catch(error){state={valid:false};$('validation').textContent=error.message;$('validation').className='error';$('align-view').textContent='Correct the input to begin.';$('stat-position').textContent='—';$('stat-comparisons').textContent='0';$('stat-windows').textContent='—';$('stat-matches').textContent='0';$('match-list').textContent='';$('step-status').textContent='';buttons();}}
+function render(){const {ref,query,last,compared}=state,start=last===null?0:last;const top=document.createElement('div'),bottom=document.createElement('div');top.className=bottom.className='align-row';for(let i=0;i<ref.length;i++){const s=document.createElement('span');s.className='ref-base'+(last!==null&&i>=start&&i<start+compared?' compared':'');s.textContent=ref[i];top.appendChild(s);}bottom.appendChild(document.createTextNode(' '.repeat(start)));[...query].forEach((base,k)=>{const s=document.createElement('span');s.className='query-base '+(last===null||k>=compared?'pending':base===ref[start+k]?'match':'mismatch');s.textContent=base;bottom.appendChild(s);});$('align-view').replaceChildren(top,bottom);$('stat-position').textContent=last===null?'—':last;$('stat-comparisons').textContent=state.comparisons;$('stat-windows').textContent=`${state.next} / ${state.total}`;$('stat-matches').textContent=state.hits.length;$('match-list').textContent=state.hits.length?'Exact starts found: '+state.hits.join(', '):'No exact matches found yet.';$('step-status').textContent=state.total===0?'The query is longer than the reference; there are no complete windows to test.':state.next===state.total?`Finished all ${state.total} starts. ${state.hits.length} exact match(es).`:last===null?'Predict first, then step or play.':`Tested start ${last}: ${compared} comparison(s). Next start is ${state.next}.`;buttons();}
+function advance(){if(!state.valid||state.next>=state.total)return stop();const start=state.next;let matched=true,compared=0;for(let k=0;k<state.query.length;k++){compared++;if(state.ref[start+k]!==state.query[k]){matched=false;if($('early-exit').checked)break;}}state.last=start;state.compared=compared;state.comparisons+=compared;if(matched)state.hits.push(start);state.next++;if(state.next===state.total)stop();render();}
+function play(){if(timer!==null||!state.valid||state.next>=state.total)return;timer=setInterval(advance,650-Number($('speed').value)*55);buttons();}
+$('play-btn').addEventListener('click',play);$('pause-btn').addEventListener('click',stop);$('step-btn').addEventListener('click',()=>{stop();advance();});$('reset-btn').addEventListener('click',reset);['ref-input','query-input'].forEach(id=>$(id).addEventListener('input',reset));$('early-exit').addEventListener('change',reset);$('speed').addEventListener('input',()=>{if(timer!==null){stop();play();}});
+$('overlap-btn').addEventListener('click',()=>{$('ref-input').value='AAAAA';$('query-input').value='AAA';reset();});$('lesson-btn').addEventListener('click',()=>{$('ref-input').value='ATGCCATGACCTATGCCA';$('query-input').value='ATGCCA';reset();});window.addEventListener('pagehide',stop);reset();
+})();
+</script></body></html>

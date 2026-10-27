@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 540" role="img" aria-labelledby="t d">
+<!-- Adapted from bioinformatis-web/diagrams/lecture-19/10-database-scaling.svg, Apache-2.0.
+Modified for Week 2: synthetic effective database lengths, recomputed logarithmic axes/curve,
+removed real-database estimates, fixed numerical examples and model interpretation.
+See README.md and ../../third_party/bioinformatis-web-LICENSE. -->
+<title id="t">Same bit score, different search space</title>
+<desc id="d">Simplified E equals m times n times 2 to the minus bit score. With bit score 40 and effective protein query length 100 residues, effective database length one million residues gives E approximately 0.00009094947; ten million gives 0.0009094947. The horizontal and vertical axes are logarithmic. Values are synthetic, not current database sizes or probabilities that a hit is false.</desc>
+<rect width="1200" height="540" fill="#fafaf9"/>
+<g font-family="Inter, sans-serif" fill="#525252">
+<text x="600" y="30" text-anchor="middle" font-size="22" font-weight="600" fill="#14243b">Same bit score, larger search space: more chance alignments</text>
+<text x="600" y="57" text-anchor="middle" font-size="15">Synthetic model · bit score 40 · effective query length 100 amino-acid residues</text>
+</g>
+<g transform="translate(120 90)">
+<line x1="0" y1="350.0000" x2="960" y2="350.0000" stroke="#e5e3dc"/><text x="-12" y="355.0000" text-anchor="end" font-family="monospace" font-size="14" fill="#525252">10^-5</text>
+<line x1="0" y1="291.6667" x2="960" y2="291.6667" stroke="#e5e3dc"/><text x="-12" y="296.6667" text-anchor="end" font-family="monospace" font-size="14" fill="#525252">10^-4</text>
+<line x1="0" y1="233.3333" x2="960" y2="233.3333" stroke="#e5e3dc"/><text x="-12" y="238.3333" text-anchor="end" font-family="monospace" font-size="14" fill="#525252">10^-3</text>
+<line x1="0" y1="175.0000" x2="960" y2="175.0000" stroke="#e5e3dc"/><text x="-12" y="180.0000" text-anchor="end" font-family="monospace" font-size="14" fill="#525252">10^-2</text>
+<line x1="0" y1="116.6667" x2="960" y2="116.6667" stroke="#e5e3dc"/><text x="-12" y="121.6667" text-anchor="end" font-family="monospace" font-size="14" fill="#525252">10^-1</text>
+<line x1="0" y1="58.3333" x2="960" y2="58.3333" stroke="#e5e3dc"/><text x="-12" y="63.3333" text-anchor="end" font-family="monospace" font-size="14" fill="#525252">10^0</text>
+<line x1="0" y1="0.0000" x2="960" y2="0.0000" stroke="#e5e3dc"/><text x="-12" y="5.0000" text-anchor="end" font-family="monospace" font-size="14" fill="#525252">10^1</text>
+<line x1="0.0000" y1="350" x2="0.0000" y2="356" stroke="#525252"/><text x="0.0000" y="378" text-anchor="middle" font-family="monospace" font-size="14" fill="#525252">10^6</text>
+<line x1="240.0000" y1="350" x2="240.0000" y2="356" stroke="#525252"/><text x="240.0000" y="378" text-anchor="middle" font-family="monospace" font-size="14" fill="#525252">10^7</text>
+<line x1="480.0000" y1="350" x2="480.0000" y2="356" stroke="#525252"/><text x="480.0000" y="378" text-anchor="middle" font-family="monospace" font-size="14" fill="#525252">10^8</text>
+<line x1="720.0000" y1="350" x2="720.0000" y2="356" stroke="#525252"/><text x="720.0000" y="378" text-anchor="middle" font-family="monospace" font-size="14" fill="#525252">10^9</text>
+<line x1="960.0000" y1="350" x2="960.0000" y2="356" stroke="#525252"/><text x="960.0000" y="378" text-anchor="middle" font-family="monospace" font-size="14" fill="#525252">10^10</text>
+<line x1="0" y1="0" x2="0" y2="350" stroke="#525252"/><line x1="0" y1="350" x2="960" y2="350" stroke="#525252"/>
+<path d="M 0 294.069990 L 960 60.736657" stroke="#1e3a8a" stroke-width="3" fill="none"/>
+<circle cx="0.000000" cy="294.069990" r="6" fill="#0d7377"/><line x1="0.000000" y1="285.069990" x2="22.0" y2="243" stroke="#0d7377"/><text x="22.0" y="235" font-family="Inter, sans-serif" font-size="14" fill="#0d7377">n = 1,000,000; E ≈ 9.09 × 10⁻⁵</text>
+<circle cx="240.000000" cy="235.736657" r="6" fill="#946018"/><line x1="240.000000" y1="226.736657" x2="262.0" y2="168" stroke="#946018"/><text x="262.0" y="160" font-family="Inter, sans-serif" font-size="14" fill="#946018">n = 10,000,000; E ≈ 9.09 × 10⁻⁴</text>
+<text x="480" y="409" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" fill="#525252">Effective database length n (amino-acid residues; log scale)</text>
+<text transform="translate(-82 175) rotate(-90)" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" fill="#525252">Expected chance alignments E (log scale)</text>
+</g>
+<rect x="120" y="506" width="960" height="27" rx="4" fill="#eef2ff"/>
+<text x="600" y="525" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" fill="#14243b">10 × effective database length → 10 × E. E is an expected count, not a probability a hit is false.</text>
+</svg>

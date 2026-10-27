@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 500" role="img" aria-labelledby="t d">
+<!-- Adapted from bioinformatis-web/diagrams/lecture-02/09-cigar-rle-diagram.svg, Apache-2.0.
+Modified for Week 2: added checked aligned sequences, query/reference consumption and coordinate scope;
+retained original operation boxes, run brackets and encoded-result composition.
+See README.md and ../../third_party/bioinformatis-web-LICENSE. -->
+<title id="t">CIGAR: grouping the operations in a checked alignment</title>
+<desc id="d">A synthetic forward alignment has reference ACGTACCGTTAC-gap-GTA and query ACGTGCC-gap-gap-TACGGTA. Sixteen alignment columns encode as 4=1X2=2D3=1I3=. The query has 14 bases; the reference segment has 15 bases. At one-based SAM position 101, the reference span is 101 through 115 inclusive. D advances only the reference and I only the query.</desc>
+<rect width="860" height="500" fill="#fafaf9"/>
+<text x="40" y="30" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600" fill="#525252" letter-spacing=".08em">FROM ALIGNMENT COLUMNS TO A STORED OPERATION STRING</text>
+<text x="40" y="54" font-family="Inter, Arial, sans-serif" font-size="12" fill="#525252">Toy forward alignment · read both rows left to right · “−” is a gap, not a base</text>
+<g font-family="Inter, Arial, sans-serif" font-size="11" fill="#525252"><text x="40" y="86">Ref.</text><text x="40" y="116">Query</text><text x="600" y="86">Reference positions 101–115</text><text x="600" y="116">Query positions 1–14</text></g>
+<g font-family="JetBrains Mono, Consolas, monospace" font-size="17" font-weight="600" text-anchor="middle">
+<text x="90" y="86" fill="#0a0a0a">A</text>
+<text x="90" y="116" fill="#0a0a0a">A</text>
+<text x="120" y="86" fill="#0a0a0a">C</text>
+<text x="120" y="116" fill="#0a0a0a">C</text>
+<text x="150" y="86" fill="#0a0a0a">G</text>
+<text x="150" y="116" fill="#0a0a0a">G</text>
+<text x="180" y="86" fill="#0a0a0a">T</text>
+<text x="180" y="116" fill="#0a0a0a">T</text>
+<text x="210" y="86" fill="#b91c1c">A</text>
+<text x="210" y="116" fill="#b91c1c">G</text>
+<text x="240" y="86" fill="#0a0a0a">C</text>
+<text x="240" y="116" fill="#0a0a0a">C</text>
+<text x="270" y="86" fill="#0a0a0a">C</text>
+<text x="270" y="116" fill="#0a0a0a">C</text>
+<text x="300" y="86" fill="#946018">G</text>
+<text x="300" y="116" fill="#946018">−</text>
+<text x="330" y="86" fill="#946018">T</text>
+<text x="330" y="116" fill="#946018">−</text>
+<text x="360" y="86" fill="#0a0a0a">T</text>
+<text x="360" y="116" fill="#0a0a0a">T</text>
+<text x="390" y="86" fill="#0a0a0a">A</text>
+<text x="390" y="116" fill="#0a0a0a">A</text>
+<text x="420" y="86" fill="#0a0a0a">C</text>
+<text x="420" y="116" fill="#0a0a0a">C</text>
+<text x="450" y="86" fill="#946018">−</text>
+<text x="450" y="116" fill="#946018">G</text>
+<text x="480" y="86" fill="#0a0a0a">G</text>
+<text x="480" y="116" fill="#0a0a0a">G</text>
+<text x="510" y="86" fill="#0a0a0a">T</text>
+<text x="510" y="116" fill="#0a0a0a">T</text>
+<text x="540" y="86" fill="#0a0a0a">A</text>
+<text x="540" y="116" fill="#0a0a0a">A</text>
+</g>
+<g transform="translate(0 150)">  <!-- Kicker -->
+  <text x="40" y="30" font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600" fill="#8a8a85" letter-spacing="0.12em">
+    GROUP IDENTICAL OPERATIONS · THEN SAVE EACH RUN
+  </text>
+
+  <!-- The 16 symbols: = = = = X = = D D = = = I = = = -->
+  <!-- Positions: start x=60, step=30. -->
+
+  <!-- Row 1: raw symbols in boxes -->
+  <g>
+    <text x="40" y="62" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="500" fill="#525252">raw</text>
+    <g font-family="JetBrains Mono, Consolas, monospace" font-size="16" font-weight="600" fill="#0a0a0a" text-anchor="middle">
+      <!-- box helper: rect at (x-11, y-14) width=22 height=22 -->
+      <!-- sequence: = = = = X = = D D = = = I = = =  (16 symbols) -->
+      <g stroke="#e5e3dc" stroke-width="1" fill="none">
+        <rect x="79"  y="52" width="22" height="22"/>
+        <rect x="109" y="52" width="22" height="22"/>
+        <rect x="139" y="52" width="22" height="22"/>
+        <rect x="169" y="52" width="22" height="22"/>
+        <rect x="199" y="52" width="22" height="22"/>
+        <rect x="229" y="52" width="22" height="22"/>
+        <rect x="259" y="52" width="22" height="22"/>
+        <rect x="289" y="52" width="22" height="22"/>
+        <rect x="319" y="52" width="22" height="22"/>
+        <rect x="349" y="52" width="22" height="22"/>
+        <rect x="379" y="52" width="22" height="22"/>
+        <rect x="409" y="52" width="22" height="22"/>
+        <rect x="439" y="52" width="22" height="22"/>
+        <rect x="469" y="52" width="22" height="22"/>
+        <rect x="499" y="52" width="22" height="22"/>
+        <rect x="529" y="52" width="22" height="22"/>
+      </g>
+      <text x="90"  y="68">=</text>
+      <text x="120" y="68">=</text>
+      <text x="150" y="68">=</text>
+      <text x="180" y="68">=</text>
+      <text x="210" y="68" fill="#b91c1c">X</text>
+      <text x="240" y="68">=</text>
+      <text x="270" y="68">=</text>
+      <text x="300" y="68" fill="#b45309">D</text>
+      <text x="330" y="68" fill="#b45309">D</text>
+      <text x="360" y="68">=</text>
+      <text x="390" y="68">=</text>
+      <text x="420" y="68">=</text>
+      <text x="450" y="68" fill="#b45309">I</text>
+      <text x="480" y="68">=</text>
+      <text x="510" y="68">=</text>
+      <text x="540" y="68">=</text>
+    </g>
+  </g>
+
+  <!-- Row 2: run brackets with run-length labels -->
+  <g transform="translate(0 110)">
+    <text x="40" y="10" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="500" fill="#525252">runs</text>
+
+    <g stroke="#1e3a8a" stroke-width="1.5" fill="none">
+      <!-- 4= covers boxes 1-4 (x=79..191) -->
+      <path d="M 79 0 L 79 6 L 191 6 L 191 0"/>
+      <!-- 1X covers box 5 (x=199..221) -->
+      <path d="M 199 0 L 199 6 L 221 6 L 221 0"/>
+      <!-- 2= covers boxes 6-7 (x=229..281) -->
+      <path d="M 229 0 L 229 6 L 281 6 L 281 0"/>
+      <!-- 2D covers boxes 8-9 (x=289..341) -->
+      <path d="M 289 0 L 289 6 L 341 6 L 341 0"/>
+      <!-- 3= covers boxes 10-12 (x=349..431) -->
+      <path d="M 349 0 L 349 6 L 431 6 L 431 0"/>
+      <!-- 1I covers box 13 (x=439..461) -->
+      <path d="M 439 0 L 439 6 L 461 6 L 461 0"/>
+      <!-- 3= covers boxes 14-16 (x=469..551) -->
+      <path d="M 469 0 L 469 6 L 551 6 L 551 0"/>
+    </g>
+    <g font-family="Inter, Arial, sans-serif" font-size="11" font-weight="600" fill="#1e3a8a" text-anchor="middle">
+      <text x="135" y="24">4 =</text>
+      <text x="210" y="24">1 X</text>
+      <text x="255" y="24">2 =</text>
+      <text x="315" y="24">2 D</text>
+      <text x="390" y="24">3 =</text>
+      <text x="450" y="24">1 I</text>
+      <text x="510" y="24">3 =</text>
+    </g>
+  </g>
+
+  <!-- Row 3: final CIGAR in its own boxed panel -->
+  <g transform="translate(60 170)">
+    <rect x="0" y="0" width="500" height="48" rx="4" fill="#ebeae3" stroke="#c4c1b6" stroke-width="1.5"/>
+    <text x="20" y="20" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="600" fill="#8a8a85" letter-spacing="0.1em">CIGAR</text>
+    <text x="250" y="34" font-family="JetBrains Mono, Consolas, monospace" font-size="18" font-weight="600" fill="#0a0a0a" text-anchor="middle" letter-spacing="0.05em">
+      4=1X2=2D3=1I3=
+    </text>
+  </g>
+
+  <!-- EE framing inset on the right -->
+  <g transform="translate(600 110)">
+    <rect x="0" y="0" width="240" height="110" rx="4" fill="#f4f3ee" stroke="#e5e3dc" stroke-width="1"/>
+    <text x="16" y="22" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="600" fill="#1e3a8a" letter-spacing="0.1em">WHAT IS SAVED?</text>
+    <text x="16" y="46" font-family="Inter, Arial, sans-serif" font-size="12" fill="#0a0a0a">Counts + operation types</text>
+    <text x="16" y="66" font-family="Inter, Arial, sans-serif" font-size="12" fill="#0a0a0a">Sequence stored separately.</text>
+    <text x="16" y="92" font-family="Inter, Arial, sans-serif" font-size="10" fill="#525252" font-style="italic">Gaps are not DNA bases.</text>
+  </g>
+</g>
+<g font-family="Inter, Arial, sans-serif" font-size="13" fill="#0a0a0a">
+<text x="40" y="420">Query advances: 4 + 1 + 2 + 0 + 3 + 1 + 3 = 14 bases</text>
+<text x="40" y="446">Reference advances: 4 + 1 + 2 + 2 + 3 + 0 + 3 = 15 bases</text>
+<text x="40" y="477" fill="#525252" font-size="12">16 alignment columns ≠ 14 query bases ≠ 15 reference bases · no clipping in this example</text>
+</g></svg>

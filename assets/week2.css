@@ -1,0 +1,17 @@
+/* Week 2 additions keep the introductory course typography and native controls. */
+.interactive-lab input[type="text"] { width: 100%; padding: .8rem; margin-bottom: 1.1rem; font: 1rem var(--font-mono); border: 1px solid #94a9b4; background: #fcfcfa; color: var(--intro-ink); border-radius: 3px; }
+.check-control { display: flex; align-items: baseline; gap: .7rem; margin: 1rem 0; font-size: .95rem; }
+.check-control input { accent-color: var(--intro-teal); }
+.interactive-lab button:disabled { opacity: .5; cursor: default; }
+.alignment-output pre { overflow-x: auto; padding: 1rem; background: #e6eeee; font: .95rem/1.8 var(--font-mono); white-space: pre; }
+.alignment-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.alignment-pair pre { white-space: pre; overflow: auto; font: .9rem/1.7 var(--font-mono); padding: 1rem; border: 1px solid #bdcdd1; }
+.dp-table { border-collapse: collapse; font: .9rem var(--font-mono); }
+.introduction .dp-table th, .introduction .dp-table td { padding: .15rem; text-align: center; vertical-align: middle; }
+.dp-table button { min-width: 2.65rem; min-height: 2.65rem; border: 1px solid #bdcdd1; border-radius: 2px; background: #fcfcfa; color: var(--intro-ink); font: inherit; cursor: pointer; }
+.dp-table .trace-cell { background: #d5eae6; border-color: var(--intro-teal); font-weight: 700; }
+.dp-table button[aria-pressed="true"] { outline: 3px solid #946018; outline-offset: -3px; }
+#search-table { font-size: .85rem; min-width: 630px; }
+#search-table .button { font-size: .8rem; padding: .45rem .65rem; }
+#search-alignment { white-space: pre; }
+@media(max-width:600px) { .alignment-pair { grid-template-columns: 1fr; } .intro-topbar { align-items: flex-start; } .topbar-links { flex-wrap: wrap; justify-content: flex-end; } }

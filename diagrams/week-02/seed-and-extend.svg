@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 420" role="img" aria-labelledby="t d">
+<!-- Adapted from bioinformatis-web/diagrams/lecture-02/10-seed-and-extend-pipeline.svg, Apache-2.0.
+Modified for the 2026/2027 Week 2 pilot: verified examples and simplified scope.
+See README.md and ../../third_party/bioinformatis-web-LICENSE. -->
+  <title id="t">Seed-and-extend pipeline</title>
+  <desc id="d">Conceptual seed-and-extend pattern: select short query words, look up candidate reference regions, align nearby sequence allowing mismatches and gaps, then compare the tested candidates. Candidate scores are not shown. Missing a useful seed can miss an alignment. No particular indexing data structure or mapping-quality calculation is implied.</desc>
+
+  <defs>
+    <marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#1e3a8a"/>
+    </marker>
+  </defs>
+
+  <!-- Stage labels above each box -->
+  <g font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#1e3a8a" letter-spacing="0.12em" text-anchor="middle">
+    <text x="110" y="40">READ</text>
+    <text x="280" y="40">SEED</text>
+    <text x="480" y="40">CANDIDATES · EXTEND</text>
+    <text x="740" y="40">ALIGNMENT</text>
+  </g>
+
+  <!-- Stage 1: Read -->
+  <g transform="translate(40 60)">
+    <rect x="0" y="0" width="140" height="60" rx="4" fill="#f4f3ee" stroke="#c4c1b6" stroke-width="1.5"/>
+    <text x="12" y="22" font-family="Inter, sans-serif" font-size="10" fill="#525252">Query sequence</text>
+    <text x="12" y="42" font-family="JetBrains Mono, monospace" font-size="11" fill="#0a0a0a">GATTAC…TAGGA</text>
+    <text x="12" y="54" font-family="Inter, sans-serif" font-size="9" fill="#8a8a85">(sequence sketch)</text>
+  </g>
+
+  <!-- Arrow 1 -->
+  <line x1="182" y1="90" x2="210" y2="90" stroke="#1e3a8a" stroke-width="1.5" marker-end="url(#arrow-accent)"/>
+
+  <!-- Stage 2: Short words seed lookup -->
+  <g transform="translate(212 60)">
+    <rect x="0" y="0" width="140" height="60" rx="4" fill="#f4f3ee" stroke="#c4c1b6" stroke-width="1.5"/>
+    <text x="70" y="22" font-family="Inter, sans-serif" font-size="10" fill="#525252" text-anchor="middle">Short words</text>
+    <text x="70" y="40" font-family="JetBrains Mono, monospace" font-size="11" fill="#0a0a0a" text-anchor="middle">TAC, TAG, …</text>
+    <text x="70" y="54" font-family="Inter, sans-serif" font-size="9" fill="#8a8a85" text-anchor="middle">look up candidate positions</text>
+  </g>
+
+  <!-- Arrow 2 -->
+  <line x1="354" y1="90" x2="382" y2="90" stroke="#1e3a8a" stroke-width="1.5" marker-end="url(#arrow-accent)"/>
+
+  <!-- Stage 3: Reference track with seeds + extension windows -->
+  <g transform="translate(384 60)">
+    <!-- Reference bar -->
+    <rect x="0" y="22" width="340" height="18" rx="2" fill="#f4f3ee" stroke="#c4c1b6" stroke-width="1.5"/>
+    <text x="0" y="14" font-family="Inter, sans-serif" font-size="10" fill="#525252">Candidate reference regions</text>
+
+    <!-- Seed 1 position (ambiguous, size 5) -->
+    <line x1="70" y1="22" x2="70" y2="40" stroke="#1e3a8a" stroke-width="2"/>
+    <rect x="50" y="22" width="40" height="18" fill="#eef2ff" stroke="none"/>
+    <!-- Seed 2 (the winner) -->
+    <line x1="170" y1="22" x2="170" y2="40" stroke="#1e3a8a" stroke-width="2"/>
+    <rect x="150" y="22" width="40" height="18" fill="#eef2ff" stroke="#1e3a8a" stroke-width="2"/>
+    <!-- Seed 3 -->
+    <line x1="270" y1="22" x2="270" y2="40" stroke="#1e3a8a" stroke-width="2"/>
+    <rect x="250" y="22" width="40" height="18" fill="#eef2ff" stroke="none"/>
+
+    <!-- SW mini matrices (3x3 glyphs) inside each shaded window -->
+    <g>
+      <g transform="translate(56 48)" stroke="#8a8a85" stroke-width="0.75" fill="none">
+        <rect x="0" y="0" width="8" height="8"/><rect x="8" y="0" width="8" height="8"/><rect x="16" y="0" width="8" height="8"/>
+        <rect x="0" y="8" width="8" height="8"/><rect x="8" y="8" width="8" height="8"/><rect x="16" y="8" width="8" height="8"/>
+        <rect x="0" y="16" width="8" height="8"/><rect x="8" y="16" width="8" height="8"/><rect x="16" y="16" width="8" height="8"/>
+      </g>
+      <text x="70" y="88" font-family="JetBrains Mono, monospace" font-size="9" fill="#8a8a85" text-anchor="middle">A</text>
+
+      <!-- Winning seed: bigger matrix with traceback -->
+      <g transform="translate(151 48)" stroke="#1e3a8a" stroke-width="1" fill="none">
+        <rect x="0" y="0" width="38" height="32" fill="#eef2ff" stroke="#1e3a8a"/>
+        <line x1="0"  y1="8" x2="38" y2="8"/>
+        <line x1="0"  y1="16" x2="38" y2="16"/>
+        <line x1="0"  y1="24" x2="38" y2="24"/>
+        <line x1="8"  y1="0" x2="8" y2="32"/>
+        <line x1="16" y1="0" x2="16" y2="32"/>
+        <line x1="24" y1="0" x2="24" y2="32"/>
+        <line x1="32" y1="0" x2="32" y2="32"/>
+        <!-- Traceback arrows -->
+        <path d="M 34 28 L 28 22 L 18 14 L 10 6" stroke="#1e3a8a" stroke-width="1.5"/>
+      </g>
+      <text x="170" y="94" font-family="JetBrains Mono, monospace" font-size="10" fill="#1e3a8a" text-anchor="middle" font-weight="600">B: best tested</text>
+
+      <g transform="translate(256 48)" stroke="#8a8a85" stroke-width="0.75" fill="none">
+        <rect x="0" y="0" width="8" height="8"/><rect x="8" y="0" width="8" height="8"/><rect x="16" y="0" width="8" height="8"/>
+        <rect x="0" y="8" width="8" height="8"/><rect x="8" y="8" width="8" height="8"/><rect x="16" y="8" width="8" height="8"/>
+        <rect x="0" y="16" width="8" height="8"/><rect x="8" y="16" width="8" height="8"/><rect x="16" y="16" width="8" height="8"/>
+      </g>
+      <text x="270" y="88" font-family="JetBrains Mono, monospace" font-size="9" fill="#8a8a85" text-anchor="middle">C</text>
+    </g>
+  </g>
+
+  <!-- Arrow 3: from the winning extension window down-right to the alignment output box.
+       Absolute coords: winning window centre is at (554, 108) in the Stage 3 track
+       (stage origin 384 + 170 local = 554 x; 60 origin + 48 local = 108 y).
+       Output box sits at (660, 150). -->
+  <path d="M 554 108 C 610 108, 620 175, 656 175"
+        stroke="#1e3a8a" stroke-width="1.5" fill="none" marker-end="url(#arrow-accent)"
+        stroke-dasharray="4 3"/>
+
+  <!-- Stage 4: Alignment output -->
+  <g transform="translate(660 150)">
+    <rect x="0" y="0" width="160" height="56" rx="4" fill="#f4f3ee" stroke="#c4c1b6" stroke-width="1.5"/>
+    <text x="12" y="20" font-family="Inter, sans-serif" font-size="10" fill="#525252">Best tested region</text>
+    <text x="12" y="40" font-family="JetBrains Mono, monospace" font-size="11" fill="#1e3a8a" font-weight="600">Score + coordinates</text>
+  </g>
+
+  <!-- Introductory interpretation strip; indexing internals are outside this week. -->
+  <g transform="translate(40 270)">
+    <text x="0" y="0" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#8a8a85" letter-spacing="0.1em">SAVE WORK, THEN CHECK THE EVIDENCE</text>
+    <rect x="0" y="12" width="780" height="112" rx="4" fill="#ebeae3" stroke="#c4c1b6"/>
+    <g font-family="Inter, sans-serif" font-size="13" fill="#525252">
+      <text x="16" y="40">Seeds narrow the regions to examine; they are candidate evidence, not a final alignment.</text>
+      <text x="16" y="69">Extension compares nearby letters and permits mismatches and gaps.</text>
+      <text x="16" y="98">A heuristic can miss a useful seed: no reported hit does not prove no similarity exists.</text>
+    </g>
+  </g>
+</svg>

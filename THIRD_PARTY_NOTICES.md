@@ -63,3 +63,51 @@ The optional input/settings/result/limit prompts in the homework handoff adapt
 reproducibility themes from upstream
 `markdown_resources/lesson14_md_files/lecture-14.md`. Their wording and examples
 are specific to this assignment.
+
+## Week 2 material
+
+Week 2 rewrites and condenses curriculum ideas from upstream `lectures/lecture-02.html`,
+`lectures/lecture-19.html`, and their coding exercises. The lesson, small browser
+algorithms, and scaffolded notebook tasks are authored for this ten-week course.
+The notebook packaging continues Week 1. The upstream licence is retained in
+`practicals/week-02/LICENSE.upstream.txt`.
+
+Five illustrations in `diagrams/week-02/` retain Apache 2.0 source and modification notices:
+
+| Upstream path | Local filename |
+|---|---|
+| `diagrams/lecture-02/01-alignment-problem-overview.svg` | `alignment-context.svg` |
+| `diagrams/lecture-02/02-brute-force-sliding.svg` | `sliding-search.svg` |
+| `diagrams/lecture-02/08-smith-waterman-matrix.svg` | `local-alignment-matrix.svg` |
+| `diagrams/lecture-02/10-seed-and-extend-pipeline.svg` | `seed-and-extend.svg` |
+| `diagrams/lecture-19/12-blast-output.svg` | `search-hit-evidence.svg` |
+
+The adaptations correct sliding positions and comparison counts, verify the
+local-alignment matrix, remove unsupported performance and significance claims,
+and replace the search report with explicitly synthetic identity/coverage
+arithmetic. See [the Week 2 figure review](diagrams/week-02/README.md).
+The source examples have their own labelled sequences and coordinate conventions.
+
+
+Additional Week 2 adaptations retain Apache 2.0 source and modification notices:
+
+| Upstream path | Local path |
+|---|---|
+| `artifacts/lecture-02/01-brute-force.html` | `artifacts/week-02/01-brute-force.html` |
+| `artifacts/lecture-02/05-smith-waterman.html` | `artifacts/week-02/02-smith-waterman.html` |
+| `artifacts/lecture-19/03-evalue-calculator.html` | `artifacts/week-02/03-evalue-explorer.html` |
+| `diagrams/lecture-19/10-database-scaling.svg` | `diagrams/week-02/search-space.svg` |
+| `diagrams/lecture-02/09-cigar-rle-diagram.svg` | `diagrams/week-02/cigar-walkthrough.svg` |
+
+Exact search retains overlapping hits; the alignment animator uses a verified
+local-alignment core. The E-value explorer removes categorical significance and
+homology verdicts and illustrates a simplified effective-search-space model.
+The CIGAR example adds checked aligned sequences, operation counts, query and
+reference consumption, and coordinates. Tools use local styles and have no
+remote font or script requirements. See the [tool inventory](artifacts/week-02/README.md)
+and [figure inventory](diagrams/week-02/README.md).
+
+`diagrams/week-02/coverage-comparison.svg` is an original course illustration
+using synthetic placements. Definition sources are linked in the lesson and
+speaker notes. The worked global cell and fitting/candidate-window explanations
+are authored for this course.

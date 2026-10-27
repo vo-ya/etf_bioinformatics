@@ -1,0 +1,104 @@
+{
+  "reference": "ATGCCATGACCTATGCCA",
+  "coordinate_system": "zero-based start positions; forward strand unless labelled otherwise",
+  "scoring": {
+    "match": 2,
+    "mismatch": -1,
+    "gap_per_column": -2
+  },
+  "exact_matches": {
+    "repeated": [
+      0,
+      12
+    ],
+    "unique": [
+      3
+    ],
+    "changed": []
+  },
+  "overlap_example": {
+    "reference": "AAAAA",
+    "query": "AAA",
+    "positions": [
+      0,
+      1,
+      2
+    ]
+  },
+  "score_table_AC_AG": [
+    [
+      0,
+      -2,
+      -4
+    ],
+    [
+      -2,
+      2,
+      0
+    ],
+    [
+      -4,
+      0,
+      1
+    ]
+  ],
+  "alignments": [
+    {
+      "case": "exact",
+      "reference": "ATGCCA",
+      "read": "ATGCCA",
+      "aligned_reference": "ATGCCA",
+      "aligned_read": "ATGCCA",
+      "score": 12
+    },
+    {
+      "case": "one substitution",
+      "reference": "ATGCCA",
+      "read": "ATGCTA",
+      "aligned_reference": "ATGCCA",
+      "aligned_read": "ATGCTA",
+      "score": 9
+    },
+    {
+      "case": "one deletion relative to reference",
+      "reference": "ATGCCA",
+      "read": "ATGCA",
+      "aligned_reference": "ATGCCA",
+      "aligned_read": "ATG-CA",
+      "score": 8
+    },
+    {
+      "case": "one insertion relative to reference",
+      "reference": "ATGCCA",
+      "read": "ATGACCA",
+      "aligned_reference": "ATG-CCA",
+      "aligned_read": "ATGACCA",
+      "score": 10
+    },
+    {
+      "case": "all mismatches",
+      "reference": "AAAA",
+      "read": "TTTT",
+      "aligned_reference": "AAAA",
+      "aligned_read": "TTTT",
+      "score": -4
+    }
+  ],
+  "tie_example": {
+    "reference": "AA",
+    "read": "A",
+    "aligned_reference": "AA",
+    "aligned_read": "-A",
+    "score": 0,
+    "equivalent_aligned_read": "A-",
+    "rule": "diagonal > up > left"
+  },
+  "optional_strands": {
+    "query": "TCATGG",
+    "reverse_complement": "CCATGA",
+    "forward_positions": [],
+    "reverse_complement_positions": [
+      3
+    ]
+  }
+}

@@ -1,0 +1,126 @@
+<!doctype html>
+<!-- Adapted from bioinformatis-web/artifacts/lecture-02/05-smith-waterman.html, Apache-2.0.
+Modified for Week 2: offline fonts, verified examples, corrected validation and accessible controls.
+Original visual layout and interactive teaching pattern retained.
+See README.md and ../../third_party/bioinformatis-web-LICENSE. -->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fill and trace a local alignment · Week 2</title><link rel="stylesheet" href="../_shared/artifact-theme.css"><style>
+    body { padding: 2rem; }
+    .artifact { max-width: 1100px; margin: 0 auto; }
+    .artifact-head { margin-bottom: 1.5rem; }
+    .artifact-head h1 { font-family: var(--font-serif); font-size: var(--text-3xl); letter-spacing: -0.02em; margin: 0 0 0.25rem; }
+    .artifact-head p { color: var(--fg-muted); font-size: var(--text-sm); line-height: var(--leading-relaxed); margin: 0; max-width: 60ch; }
+
+    .panel { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
+    .panel-label { font-family: var(--font-sans); font-size: var(--text-xs); letter-spacing: 0.16em; text-transform: uppercase; color: var(--fg-subtle); margin: 0 0 0.85rem; font-weight: 600; }
+    .field-label { font-family: var(--font-sans); font-size: var(--text-xs); letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; color: var(--fg-muted); display: block; margin-bottom: 0.4rem; }
+    .seq-input { font-family: var(--font-mono); font-size: var(--text-sm); padding: 0.45rem 0.65rem; background: var(--bg-muted); border: 1px solid var(--border); border-radius: var(--radius-sm); letter-spacing: 0.05em; width: 220px; }
+    .seq-input:focus { background: var(--bg-elevated); border-color: var(--accent-bright); }
+    .btn { font-family: var(--font-sans); font-size: var(--text-sm); font-weight: 500; padding: 0.5rem 0.9rem; background: var(--bg-muted); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--fg); cursor: pointer; }
+    .btn:hover:not(:disabled) { background: var(--bg-inset); border-color: var(--border-strong); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn--primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .controls { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    .score-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 0.75rem; margin-top: 0.75rem;
+    }
+    .score-field { display: flex; flex-direction: column; gap: 0.25rem; }
+    .score-field input {
+      font-family: var(--font-mono); font-size: var(--text-sm);
+      padding: 0.4rem 0.6rem; background: var(--bg-muted);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+    }
+
+    /* Matrix */
+    .matrix-wrap {
+      overflow-x: auto;
+      padding: 0.5rem 0;
+    }
+    table.sw {
+      border-collapse: collapse;
+      font-family: var(--font-mono); font-size: var(--text-sm);
+    }
+    table.sw th, table.sw td {
+      width: 42px; height: 34px;
+      text-align: center; vertical-align: middle;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    table.sw th {
+      background: var(--bg-inset); font-weight: 600;
+      font-family: var(--font-mono); font-size: var(--text-sm);
+    }
+    table.sw td { background: var(--bg-elevated); cursor: default; }
+    table.sw td.filled { color: var(--fg); }
+    table.sw td.zero { color: var(--fg-subtle); }
+    table.sw td:hover { background: #eef2ff; outline: 1px solid var(--accent); outline-offset: -1px; }
+    table.sw td.max {
+      outline: 2.5px solid var(--accent); outline-offset: -2.5px;
+      font-weight: 700;
+    }
+    table.sw td.trace {
+      background: #eef2ff; color: var(--accent); font-weight: 700;
+    }
+    table.sw td .arrow {
+      position: absolute; top: 2px; right: 2px;
+      font-size: 0.65rem; color: var(--accent); font-weight: 700;
+    }
+
+    .hover-card {
+      margin-top: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg-muted); border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono); font-size: var(--text-sm);
+      min-height: 3em;
+    }
+    .hover-card.active { background: #eef2ff; border-color: var(--accent); }
+    .hover-card .cand { display: inline-block; margin-right: 1rem; }
+    .hover-card .winner { font-weight: 700; color: var(--accent); }
+
+    .output {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1rem; align-items: center;
+      margin-top: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg-inset); border-radius: var(--radius-sm);
+    }
+    .output .align {
+      font-family: var(--font-mono); font-size: var(--text-base);
+      line-height: 1.6; letter-spacing: 0.15em; color: var(--fg);
+    }
+    .output .cigar {
+      font-family: var(--font-mono); font-size: var(--text-xl);
+      font-weight: 600; color: var(--accent);
+    }
+
+    @media (max-width: 720px) {
+      body { padding: 1rem; }
+      .panel { padding: 1rem; }
+      .artifact-head h1 { font-size: var(--text-2xl); }
+      .seq-input { width: 100%; }
+    }
+
+[hidden]{display:none!important} .prompt{border-left:3px solid var(--accent);padding:.7rem 1rem;background:var(--accent-bg);margin:1rem 0} .error{color:var(--error)} pre{overflow-x:auto;white-space:pre} button,input,select{max-width:100%} .hint{font-size:.85rem;color:var(--fg-muted)} table.sw button{position:relative;display:block;width:100%;min-width:42px;min-height:34px;border:0;background:transparent;color:inherit;font:inherit;cursor:pointer}.output{grid-template-columns:minmax(0,1fr) auto}.output pre{margin:0;letter-spacing:.03em}.seq-input{max-width:100%}@media(max-width:520px){.output{grid-template-columns:1fr}}</style></head><body>
+<main class="artifact" data-artifact="week2-smith-waterman"><header class="artifact-head"><h1>Local alignment score table</h1><p>Fill the table one cell at a time, then trace back from a highest score to zero. Match +2, mismatch −1, each gap base −2.</p></header><p class="prompt"><strong>Predict (3 minutes):</strong> Which region do TTACGTAA and GGACGTCC share? Fill several cells, choose a cell to explain, then trace back. Why does local alignment stop at zero?</p>
+<section class="panel"><div class="controls"><div><label class="field-label" for="ref-input">Reference (1–15 DNA bases)</label><input id="ref-input" class="seq-input" maxlength="15" value="TTACGTAA" spellcheck="false"></div><div><label class="field-label" for="query-input">Query (1–15 DNA bases)</label><input id="query-input" class="seq-input" maxlength="15" value="GGACGTCC" spellcheck="false"></div></div><p>Rows consume reference letters; columns consume query letters. The zero row and column represent empty prefixes. Ties choose diagonal, then above, then left; one optimum is shown.</p><div class="controls"><button id="step-btn" class="btn btn--primary" type="button">Step-fill one cell</button><button id="fill-btn" class="btn" type="button">Fill matrix</button><button id="traceback-btn" class="btn" type="button" disabled>Step traceback</button><button id="trace-all-btn" class="btn" type="button" disabled>Show whole traceback</button><button id="reset-btn" class="btn" type="button">Reset</button><button id="original-btn" class="btn" type="button">Original GATTACA / GCATGCA example</button></div><p id="validation" role="status" aria-live="polite"></p></section>
+<section class="panel"><div class="matrix-wrap"><table class="sw" id="sw-table"></table></div><p id="step-status" role="status" aria-live="polite"></p><div id="hover-card" class="hover-card" role="status" aria-live="polite">Select a filled cell to inspect its candidate scores.</div><p class="panel-label" style="margin-top:1rem">Local alignment after traceback</p><div class="output"><pre id="align-display" class="align">Fill the matrix, then trace back.</pre><div id="score-display" class="cigar">—</div></div><p id="alignment-summary" role="status" aria-live="polite"></p><p class="hint">A highlighted arrow points to the predecessor on this traceback. Traceback stops at zero. Coordinates below are zero-based, with the end excluded. Each gap base has the same cost.</p></section></main>
+<script src="alignment-core.js"></script><script src="../_shared/resize.js" defer></script><script>
+
+(() => {
+'use strict';const $=id=>document.getElementById(id),core=Week2Alignment;let state={valid:false};
+function ready(){return state.valid&&state.filled===state.ref.length*state.query.length;}
+function buttons(){$('step-btn').disabled=$('fill-btn').disabled=!state.valid||ready();$('traceback-btn').disabled=$('trace-all-btn').disabled=!ready()||state.trace===state.result.path.length;}
+function reset(){try{const ref=core.dna($('ref-input').value),query=core.dna($('query-input').value);if(ref.length>15||query.length>15)throw new Error('Use at most 15 bases per sequence.');state={ref,query,result:core.align(ref,query,'local'),filled:0,trace:0,valid:true};$('validation').textContent='';$('validation').className='';$('hover-card').textContent='Select a filled cell to inspect its candidate scores.';render();}catch(error){state={valid:false};$('validation').textContent=error.message;$('validation').className='error';$('sw-table').replaceChildren();$('align-display').textContent='Correct the input to begin.';$('score-display').textContent='—';$('step-status').textContent='';$('alignment-summary').textContent='';$('hover-card').textContent='';buttons();}}
+function visible(i,j){return i===0||j===0||(i-1)*state.query.length+j<=state.filled;}
+function inspect(i,j){if(!visible(i,j)){$('hover-card').textContent=`Cell (${i}, ${j}) has not been filled yet.`;return;}const H=state.result.table;if(!i||!j){$('hover-card').textContent=`Boundary (${i}, ${j}) = 0: local alignment does not charge for unrelated ends.`;return;}const diag=H[i-1][j-1]+(state.ref[i-1]===state.query[j-1]?2:-1),up=H[i-1][j]-2,left=H[i][j-1]-2;$('hover-card').textContent=`H[${i}][${j}] = max(0, diagonal ${diag}, above ${up}, left ${left}) = ${H[i][j]}. Reference ${state.ref[i-1]}, query ${state.query[j-1]}.`;}
+function render(){const {ref,query,result}=state,H=result.table,shown=result.path.slice(0,state.trace),path=new Set(shown.map(p=>p.join(',')));let html='<caption>Reference prefixes down rows; query prefixes across columns. Select cells with a click, Tab/Enter, or arrow keys.</caption><thead><tr><th scope="col">Ref / query</th>'+['∅',...query].map(c=>`<th scope="col">${c}</th>`).join('')+'</tr></thead><tbody>';H.forEach((row,i)=>{html+=`<tr><th scope="row">${i?ref[i-1]:'∅'}</th>`;row.forEach((v,j)=>{const show=visible(i,j),onPath=path.has(`${i},${j}`),max=ready()&&i===result.end[0]&&j===result.end[1]&&result.score>0;let arrow='';const index=shown.findIndex(p=>p[0]===i&&p[1]===j);if(index>=0&&index<shown.length-1){const next=shown[index+1];arrow=next[0]<i&&next[1]<j?'↖':next[0]<i?'↑':'←';}html+=`<td class="${onPath?'trace ':''}${max?'max ':''}${v===0?'zero':''}"><button type="button" data-i="${i}" data-j="${j}" tabindex="${i===0&&j===0?'0':'-1'}" aria-label="Row ${i}, column ${j}, ${show?'score '+v:'unfilled'}${onPath?', traceback':''}">${show?v:'·'}<span class="arrow" aria-hidden="true">${arrow}</span></button></td>`;});html+='</tr>';});$('sw-table').innerHTML=html+'</tbody>';
+if(!ready()){$('step-status').textContent=`${state.filled} / ${ref.length*query.length} interior cells filled. Boundaries stay zero.`;$('align-display').textContent='Fill the matrix, then trace back.';$('score-display').textContent='—';$('alignment-summary').textContent='';}else if(!state.trace){$('step-status').textContent=`Matrix complete. Highest local score ${result.score}. Begin traceback at (${result.end[0]}, ${result.end[1]}).`;$('align-display').textContent='Traceback not yet revealed.';$('score-display').textContent=`Score ${result.score}`;$('alignment-summary').textContent='';}else{const p=shown[shown.length-1];$('step-status').textContent=state.trace===1?`Start traceback at (${p[0]}, ${p[1]}), score ${H[p[0]][p[1]]}.`:`Traceback reaches (${p[0]}, ${p[1]}), score ${H[p[0]][p[1]]}${H[p[0]][p[1]]===0?'; stop here.':'.'}`;if(state.trace===result.path.length){const a=result.reference,b=result.query,marks=[...a].map((c,k)=>c===b[k]?'|':c==='-'||b[k]==='-'?' ':'.').join('');$('align-display').textContent=a?`${a}
+${marks}
+${b}`:'No positive-scoring local alignment.';$('alignment-summary').textContent=`Reference [${result.start[0]}, ${result.end[0]}), query [${result.start[1]}, ${result.end[1]}). Best score ${result.score}; identity ${result.identity===null?'undefined (empty alignment)':Number(result.identity.toFixed(1))+'%'}; query coverage ${Number(result.queryCoverage.toFixed(1))}%.`;}else{$('align-display').textContent='Traceback is in progress; follow it to the zero cell.';$('alignment-summary').textContent='';}}buttons();}
+$('step-btn').addEventListener('click',()=>{if(!state.valid||ready())return;state.filled++;render();const i=Math.floor((state.filled-1)/state.query.length)+1,j=(state.filled-1)%state.query.length+1;inspect(i,j);});$('fill-btn').addEventListener('click',()=>{state.filled=state.ref.length*state.query.length;render();});$('traceback-btn').addEventListener('click',()=>{if(ready()&&state.trace<state.result.path.length){state.trace++;render();}});$('trace-all-btn').addEventListener('click',()=>{if(ready()){state.trace=state.result.path.length;render();}});$('reset-btn').addEventListener('click',reset);['ref-input','query-input'].forEach(id=>$(id).addEventListener('input',reset));$('original-btn').addEventListener('click',()=>{$('ref-input').value='GATTACA';$('query-input').value='GCATGCA';reset();});
+$('sw-table').addEventListener('click',e=>{const b=e.target.closest('button[data-i]');if(b)inspect(Number(b.dataset.i),Number(b.dataset.j));});$('sw-table').addEventListener('keydown',e=>{const b=e.target.closest('button[data-i]');if(!b)return;let i=Number(b.dataset.i),j=Number(b.dataset.j);if(e.key==='ArrowUp')i--;else if(e.key==='ArrowDown')i++;else if(e.key==='ArrowLeft')j--;else if(e.key==='ArrowRight')j++;else return;e.preventDefault();i=Math.max(0,Math.min(state.ref.length,i));j=Math.max(0,Math.min(state.query.length,j));const next=$('sw-table').querySelector(`button[data-i="${i}"][data-j="${j}"]`);$('sw-table').querySelectorAll('button').forEach(x=>x.tabIndex=x===next?0:-1);next.focus();inspect(i,j);});reset();
+})();
+</script></body></html>

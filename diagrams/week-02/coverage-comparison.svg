@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1152" height="460" viewBox="0 0 1152 460" role="img" aria-labelledby="title desc">
+<title id="title">Query coverage and average read depth measure different things</title>
+<desc id="desc">A search hit includes six of twelve query bases, giving 50 percent query coverage. Below, three four-base reads cover a twelve-base reference. Spread reads give depth one everywhere and cover all positions. Clustered reads give depth three at four positions and zero at eight positions. Both arrangements have twelve aligned read bases divided by twelve reference bases, or one times average depth.</desc>
+<style>text{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;fill:#14243b}.label{font-size:21px;fill:#526071}.heading{font-size:25px;font-weight:600}.result{font-size:26px;fill:#0d7377}.num{font-size:17px;text-anchor:middle}.base{fill:#fcfcfa;stroke:#b9c5ce}.read{fill:#325eaa}.depth{fill:#0d7377}</style>
+<text x="0" y="27" class="heading">Query coverage: one search hit</text>
+<text x="0" y="66" class="label">Query</text>
+<text x="0" y="104" class="label">Aligned region</text>
+<rect class="base" x="160" y="43" width="34" height="29"/><text class="num" x="177" y="64">1</text>
+<rect class="base" x="194" y="43" width="34" height="29"/><text class="num" x="211" y="64">2</text>
+<rect class="base" x="228" y="43" width="34" height="29"/><text class="num" x="245" y="64">3</text>
+<rect class="base" x="262" y="43" width="34" height="29"/><text class="num" x="279" y="64">4</text>
+<rect class="base" x="296" y="43" width="34" height="29"/><text class="num" x="313" y="64">5</text>
+<rect class="base" x="330" y="43" width="34" height="29"/><text class="num" x="347" y="64">6</text>
+<rect class="base" x="364" y="43" width="34" height="29"/><text class="num" x="381" y="64">7</text>
+<rect class="base" x="398" y="43" width="34" height="29"/><text class="num" x="415" y="64">8</text>
+<rect class="base" x="432" y="43" width="34" height="29"/><text class="num" x="449" y="64">9</text>
+<rect class="base" x="466" y="43" width="34" height="29"/><text class="num" x="483" y="64">10</text>
+<rect class="base" x="500" y="43" width="34" height="29"/><text class="num" x="517" y="64">11</text>
+<rect class="base" x="534" y="43" width="34" height="29"/><text class="num" x="551" y="64">12</text>
+<rect x="262" y="85" width="204" height="24" fill="#0d7377"/>
+<text x="670" y="65" class="result">6 / 12 query bases = 50%</text>
+<text x="670" y="101" class="label">Which fraction of this query is aligned?</text>
+<line x1="0" y1="129" x2="1152" y2="129" stroke="#d9e0e5"/>
+<text x="0" y="166" class="heading">Average coverage: three 4-base reads on a 12-base reference</text>
+<g transform="translate(0,0)"><text x="0" y="203" class="heading">Spread reads</text><text x="0" y="237" class="label">Reference</text><text x="0" y="285" class="label">Reads</text><text x="0" y="345" class="label">Depth</text>
+<rect class="base" x="140" y="216" width="32" height="27"/><text class="num" x="156" y="236">1</text>
+<rect class="base" x="172" y="216" width="32" height="27"/><text class="num" x="188" y="236">2</text>
+<rect class="base" x="204" y="216" width="32" height="27"/><text class="num" x="220" y="236">3</text>
+<rect class="base" x="236" y="216" width="32" height="27"/><text class="num" x="252" y="236">4</text>
+<rect class="base" x="268" y="216" width="32" height="27"/><text class="num" x="284" y="236">5</text>
+<rect class="base" x="300" y="216" width="32" height="27"/><text class="num" x="316" y="236">6</text>
+<rect class="base" x="332" y="216" width="32" height="27"/><text class="num" x="348" y="236">7</text>
+<rect class="base" x="364" y="216" width="32" height="27"/><text class="num" x="380" y="236">8</text>
+<rect class="base" x="396" y="216" width="32" height="27"/><text class="num" x="412" y="236">9</text>
+<rect class="base" x="428" y="216" width="32" height="27"/><text class="num" x="444" y="236">10</text>
+<rect class="base" x="460" y="216" width="32" height="27"/><text class="num" x="476" y="236">11</text>
+<rect class="base" x="492" y="216" width="32" height="27"/><text class="num" x="508" y="236">12</text>
+<rect class="read" x="140" y="252" width="128" height="16" rx="2"/>
+<rect class="read" x="268" y="274" width="128" height="16" rx="2"/>
+<rect class="read" x="396" y="296" width="128" height="16" rx="2"/>
+<line x1="140" y1="348" x2="524" y2="348" stroke="#b9c5ce"/>
+<rect class="depth" x="142" y="339" width="28" height="9"/>
+<text class="num" x="156" y="370">1</text>
+<rect class="depth" x="174" y="339" width="28" height="9"/>
+<text class="num" x="188" y="370">1</text>
+<rect class="depth" x="206" y="339" width="28" height="9"/>
+<text class="num" x="220" y="370">1</text>
+<rect class="depth" x="238" y="339" width="28" height="9"/>
+<text class="num" x="252" y="370">1</text>
+<rect class="depth" x="270" y="339" width="28" height="9"/>
+<text class="num" x="284" y="370">1</text>
+<rect class="depth" x="302" y="339" width="28" height="9"/>
+<text class="num" x="316" y="370">1</text>
+<rect class="depth" x="334" y="339" width="28" height="9"/>
+<text class="num" x="348" y="370">1</text>
+<rect class="depth" x="366" y="339" width="28" height="9"/>
+<text class="num" x="380" y="370">1</text>
+<rect class="depth" x="398" y="339" width="28" height="9"/>
+<text class="num" x="412" y="370">1</text>
+<rect class="depth" x="430" y="339" width="28" height="9"/>
+<text class="num" x="444" y="370">1</text>
+<rect class="depth" x="462" y="339" width="28" height="9"/>
+<text class="num" x="476" y="370">1</text>
+<rect class="depth" x="494" y="339" width="28" height="9"/>
+<text class="num" x="508" y="370">1</text>
+<text x="0" y="408" class="result">Mean depth: 12 / 12 = 1×</text><text x="0" y="444" class="label">Reference positions covered: 12/12 = 100%</text></g>
+<g transform="translate(600,0)"><text x="0" y="203" class="heading">Clustered reads</text><text x="0" y="237" class="label">Reference</text><text x="0" y="285" class="label">Reads</text><text x="0" y="345" class="label">Depth</text>
+<rect class="base" x="140" y="216" width="32" height="27"/><text class="num" x="156" y="236">1</text>
+<rect class="base" x="172" y="216" width="32" height="27"/><text class="num" x="188" y="236">2</text>
+<rect class="base" x="204" y="216" width="32" height="27"/><text class="num" x="220" y="236">3</text>
+<rect class="base" x="236" y="216" width="32" height="27"/><text class="num" x="252" y="236">4</text>
+<rect class="base" x="268" y="216" width="32" height="27"/><text class="num" x="284" y="236">5</text>
+<rect class="base" x="300" y="216" width="32" height="27"/><text class="num" x="316" y="236">6</text>
+<rect class="base" x="332" y="216" width="32" height="27"/><text class="num" x="348" y="236">7</text>
+<rect class="base" x="364" y="216" width="32" height="27"/><text class="num" x="380" y="236">8</text>
+<rect class="base" x="396" y="216" width="32" height="27"/><text class="num" x="412" y="236">9</text>
+<rect class="base" x="428" y="216" width="32" height="27"/><text class="num" x="444" y="236">10</text>
+<rect class="base" x="460" y="216" width="32" height="27"/><text class="num" x="476" y="236">11</text>
+<rect class="base" x="492" y="216" width="32" height="27"/><text class="num" x="508" y="236">12</text>
+<rect class="read" x="140" y="252" width="128" height="16" rx="2"/>
+<rect class="read" x="140" y="274" width="128" height="16" rx="2"/>
+<rect class="read" x="140" y="296" width="128" height="16" rx="2"/>
+<line x1="140" y1="348" x2="524" y2="348" stroke="#b9c5ce"/>
+<rect class="depth" x="142" y="321" width="28" height="27"/>
+<text class="num" x="156" y="370">3</text>
+<rect class="depth" x="174" y="321" width="28" height="27"/>
+<text class="num" x="188" y="370">3</text>
+<rect class="depth" x="206" y="321" width="28" height="27"/>
+<text class="num" x="220" y="370">3</text>
+<rect class="depth" x="238" y="321" width="28" height="27"/>
+<text class="num" x="252" y="370">3</text>
+<text class="num" x="284" y="370">0</text>
+<text class="num" x="316" y="370">0</text>
+<text class="num" x="348" y="370">0</text>
+<text class="num" x="380" y="370">0</text>
+<text class="num" x="412" y="370">0</text>
+<text class="num" x="444" y="370">0</text>
+<text class="num" x="476" y="370">0</text>
+<text class="num" x="508" y="370">0</text>
+<text x="0" y="408" class="result">Mean depth: 12 / 12 = 1×</text><text x="0" y="444" class="label">Reference positions covered: 4/12 = 33.3%</text></g>
+</svg>

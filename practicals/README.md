@@ -8,19 +8,20 @@ is required. Homework follows each lecture; extensions are optional.
 | Week | Student notebook | Instructor notebook |
 |---|---|---|
 | 1 | [FASTQ and confidence](week-01/exercise.ipynb) | [Reference](week-01/solutions.ipynb) |
+| 2 | [Search and alignment](week-02/exercise.ipynb) | [Reference](week-02/solutions.ipynb) |
 
 ## Open, run, and save
 
 The Open in Colab badges use
 `https://colab.research.google.com/github/vo-ya/etf_bioinformatics/blob/main/practicals/week-NN/exercise.ipynb`.
-Week 1 is published on GitHub `main`. Alternatively, download the notebook
+Weeks 1 and 2 are published on GitHub `main`. Alternatively, download the notebook
 and use Colab's **File → Upload notebook**. An existing local Jupyter environment also works.
 
 1. Save your own copy and use a **None / CPU** hardware accelerator setting.
 2. Run **0. Run first — CPU/Python setup**. It checks Python 3.9 or later and
    explains that the code needs no installs or GPU.
 3. Run **1. Create the deterministic teaching data** in Step 1. Week 1 uses
-   a fixed simulation seed.
+   a fixed simulation seed; Week 2 uses literal synthetic sequences.
 4. Attempt each exercise, rerun its function definition, and run its checks.
 5. If needed, reveal the optional reference **after the check cell**. Running
    that form replaces the function definition; rerun the checks above it.
@@ -29,7 +30,7 @@ and use Colab's **File → Upload notebook**. An existing local Jupyter environm
 
 The analysis code has no network requests. Colab itself and the badge image
 need internet access. Week 1 optionally plots with matplotlib; its numerical
-table works if plotting is unavailable.
+table works if plotting is unavailable. Week 2 uses only the Python standard library.
 See the [official Colab FAQ](https://research.google.com/colaboratory/faq.html)
 for upload, storage, download, and CPU runtime settings.
 
@@ -59,7 +60,8 @@ Regenerate and check from the repository root:
 
 ```sh
 python3 practicals/week-01/build_notebook.py
-python3 -m unittest discover -s tests -p 'test_week01_practical.py'
+python3 practicals/week-02/build_notebook.py
+python3 -m unittest discover -s tests -p 'test_week0[12]_practical.py'
 ```
 
 Builds are deterministic. Tests execute complete instructor notebooks from
