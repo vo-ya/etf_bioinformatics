@@ -1,5 +1,7 @@
 # Bioinformatics for Engineers
 
+**Course website:** [vo-ya.github.io/etf_bioinformatics](https://vo-ya.github.io/etf_bioinformatics/)
+
 A ten-week introductory course for engineering students. **Weeks 1 and 2 are published**,
 with lessons, browser presentations, interactive activities, Colab homework,
 and instructor guides. Later weeks will be published separately.
