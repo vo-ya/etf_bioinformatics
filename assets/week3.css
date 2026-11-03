@@ -1,0 +1,13 @@
+/* Assembly investigations extend the established lesson design. */
+.interactive-lab textarea {width:100%;min-height:7rem;padding:.8rem;border:1px solid #94a9b4;background:#fcfcfa;color:var(--intro-ink);font:1rem/1.6 var(--font-mono);border-radius:3px;}
+.interactive-lab fieldset {border:0;padding:0;margin:1rem 0;min-width:0;}
+.interactive-lab legend {font-weight:700;margin-bottom:.7rem;}
+.interactive-lab select {max-width:100%;}
+.assembly-pair {display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.assembly-pair pre {overflow:auto;white-space:pre;padding:1rem;background:#e6eeee;font:1rem/1.7 var(--font-mono);}
+.assembly-pair small {font: .8rem var(--font-body);}
+.validation-message {color:#9a382d;font-weight:600;}
+#overlap-history {white-space:pre-wrap;overflow-wrap:anywhere;}
+#overlap-options {display:flex;flex-wrap:wrap;gap:.6rem;margin:1rem 0;}
+#repeat-table {width:100%;font-family:var(--font-mono);}
+@media(max-width:600px){.assembly-pair{grid-template-columns:1fr;}.topbar-links{flex-wrap:wrap;justify-content:flex-end;}}

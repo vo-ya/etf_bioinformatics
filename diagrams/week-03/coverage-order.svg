@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 360" width="1100" height="360" role="img" aria-labelledby="title">
+<title id="title">Complete breadth does not determine read order</title>
+<style>text{font-family:Arial,sans-serif;fill:#14243b;font-size:24px}.small{font-size:21px;fill:#526071}.word{font-family:monospace;font-size:31px}.teal{fill:#0d7377}.rust{fill:#ad4936}.rule{stroke:#d9e0e5;stroke-width:2}</style>
+
+<text x="0" y="28">The simulator knows the positions</text>
+<rect x="0" y="52" width="320" height="58" fill="#e0efed"/><rect x="335" y="52" width="320" height="58" fill="#e0efed"/><rect x="670" y="52" width="320" height="58" fill="#e0efed"/>
+<text class="word" x="160" y="91" text-anchor="middle">ATGA</text><text class="word" x="495" y="91" text-anchor="middle">CCTG</text><text class="word" x="830" y="91" text-anchor="middle">GTAC</text>
+<text class="small" x="0" y="146">Starts 0, 4, 8 on ATGACCTGGTAC → every position covered once</text>
+<line class="rule" x1="0" y1="174" x2="1080" y2="174"/>
+<text x="0" y="219">Without those positions, both orders contain the reads</text>
+<text class="word teal" x="0" y="272">ATGA | CCTG | GTAC</text>
+<text class="word teal" x="0" y="326">ATGA | GTAC | CCTG</text>
+<text class="small" x="650" y="278">No read links one block</text><text class="small" x="650" y="309">to the next.</text>
+
+</svg>

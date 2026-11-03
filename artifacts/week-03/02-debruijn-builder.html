@@ -1,0 +1,337 @@
+<!doctype html>
+<!-- Adapted from bioinformatis-web/artifacts/lecture-03/03-debruijn-builder.html, Apache-2.0.
+Modified for the 180-minute Week 3 pilot: strict inputs, exact toy assumptions,
+accessible controls and verified core calculations. Original layout/palette retained.
+See README.md and ../../third_party/bioinformatis-web-LICENSE. -->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Build and traverse a de Bruijn graph · Week 3</title><link rel="stylesheet" href="../_shared/artifact-theme.css"><style>
+    body { padding: 2rem; }
+    .artifact { max-width: 1100px; margin: 0 auto; }
+
+    .artifact-head { margin-bottom: 1.5rem; }
+    .artifact-head h1 {
+      font-family: var(--font-serif);
+      font-size: var(--text-3xl);
+      letter-spacing: -0.02em;
+      margin: 0 0 0.25rem;
+    }
+    .artifact-head p {
+      color: var(--fg-muted);
+      font-size: var(--text-sm);
+      line-height: var(--leading-relaxed);
+      margin: 0;
+      max-width: 62ch;
+    }
+
+    .panel {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .panel-label {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      margin: 0 0 0.85rem;
+      font-weight: 600;
+    }
+
+    .field-label {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--fg-muted);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .seq-input {
+      flex: 1;
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      padding: 0.5rem 0.7rem;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+    }
+    .seq-input:focus { background: var(--bg-elevated); border-color: var(--accent-bright); outline: none; }
+
+    .btn {
+      font-family: var(--font-sans);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      padding: 0.5rem 0.9rem;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--fg);
+      cursor: pointer;
+    }
+    .btn:hover:not(:disabled) { background: var(--bg-inset); border-color: var(--border-strong); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn--primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .btn--primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+    .btn--ghost {
+      background: transparent;
+      border: 1px dashed var(--border-strong);
+      color: var(--fg-muted);
+    }
+    .btn--ghost:hover:not(:disabled) { background: var(--bg-muted); color: var(--fg); }
+    .btn--icon {
+      padding: 0.25rem 0.55rem;
+      font-size: var(--text-sm);
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--fg-subtle);
+      line-height: 1;
+    }
+    .btn--icon:hover:not(:disabled) { background: var(--bg-muted); color: var(--error); border-color: var(--border-strong); }
+
+    .controls {
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .controls label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: var(--text-sm);
+      color: var(--fg-muted);
+    }
+    .controls input[type="range"] { accent-color: var(--accent); width: 120px; }
+    .controls .k-readout {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      color: var(--fg);
+      min-width: 1.5em;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .read-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .read-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .read-row .read-idx {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      color: var(--fg-subtle);
+      min-width: 2.2em;
+    }
+
+    /* k-mer decomposition panel */
+    .kmer-block {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      line-height: 1.7;
+      padding: 0.6rem 0.9rem;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 0.55rem;
+    }
+    .kmer-block .read-header {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+    .kmer-block .read-header .read-seq {
+      font-family: var(--font-mono);
+      letter-spacing: 0.05em;
+      color: var(--fg);
+      text-transform: none;
+      margin-left: 0.5rem;
+      font-weight: 500;
+    }
+    .kmer-line .kmer { color: var(--accent); font-weight: 600; }
+    .kmer-line .arrow { color: var(--fg-subtle); margin: 0 0.4rem; }
+    .kmer-line .sep { color: var(--fg-subtle); margin: 0 0.4rem; }
+    .kmer-line .prefix, .kmer-line .suffix { color: var(--fg); }
+    .kmer-empty { color: var(--fg-subtle); font-style: italic; font-family: var(--font-sans); font-size: var(--text-xs); }
+
+    /* Graph panel */
+    .graph-wrap {
+      position: relative;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+    }
+    svg.debruijn {
+      display: block;
+      width: 100%;
+      height: auto;
+      user-select: none;
+    }
+    .node-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      fill: var(--fg);
+      pointer-events: none;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+    .edge-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      fill: var(--fg-muted);
+      pointer-events: none;
+      text-anchor: middle;
+      dominant-baseline: central;
+    }
+    .node-hit { cursor: pointer; }
+    .node-hit circle.node-circle {
+      fill: var(--bg-muted);
+      stroke: var(--fg);
+      stroke-width: 1.5;
+      transition: fill 0.12s ease, stroke 0.12s ease;
+    }
+    .node-hit.is-hover circle.node-circle {
+      fill: var(--accent-bg);
+      stroke: var(--accent);
+      stroke-width: 2;
+    }
+    .edge line.edge-line {
+      stroke: var(--accent);
+      stroke-width: 1.4;
+      opacity: 0.55;
+      transition: opacity 0.12s ease, stroke-width 0.12s ease;
+    }
+    .edge path.edge-path {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 1.4;
+      opacity: 0.55;
+      transition: opacity 0.12s ease, stroke-width 0.12s ease;
+    }
+    .edge.is-hover line.edge-line,
+    .edge.is-hover path.edge-path { opacity: 1; stroke-width: 2.2; }
+    .edge.is-hover text.edge-label { fill: var(--accent); font-weight: 600; }
+
+    .graph-tooltip {
+      position: absolute;
+      pointer-events: none;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.7rem;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      line-height: 1.5;
+      color: var(--fg);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      max-width: 260px;
+      opacity: 0;
+      transform: translate(-50%, -100%);
+      transition: opacity 0.12s ease;
+      z-index: 10;
+    }
+    .graph-tooltip.is-visible { opacity: 1; }
+    .graph-tooltip .tt-head {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .graph-tooltip .tt-node {
+      font-family: var(--font-mono);
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .graph-tooltip .tt-row { margin-top: 0.2rem; }
+    .graph-tooltip .tt-dir {
+      font-family: var(--font-sans);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      margin-right: 0.35rem;
+    }
+
+    .status-line {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      padding: 0.85rem 1rem;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-top: 1rem;
+    }
+    .status-line .label {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      font-weight: 600;
+      margin: 0;
+    }
+    .status-line .value {
+      font-family: var(--font-mono);
+      font-size: var(--text-lg);
+      color: var(--fg);
+      margin: 0.15rem 0 0;
+    }
+    .status-line .value.emphasis { color: var(--accent); }
+
+    .hint {
+      font-size: var(--text-xs);
+      color: var(--fg-muted);
+      margin-top: 0.6rem;
+      line-height: var(--leading-relaxed);
+    }
+    .hint code {
+      font-family: var(--font-mono);
+      background: var(--bg-muted);
+      padding: 0.05rem 0.3rem;
+      border-radius: 2px;
+      color: var(--fg);
+    }
+
+    .empty-state {
+      padding: 2rem 1rem;
+      text-align: center;
+      color: var(--fg-subtle);
+      font-size: var(--text-sm);
+    }
+
+    @media (max-width: 720px) {
+      body { padding: 1rem; }
+      .panel { padding: 1rem; }
+      .artifact-head h1 { font-size: var(--text-2xl); }
+    }
+
+[hidden]{display:none!important}.prompt{padding:.8rem 1rem;border-left:3px solid var(--accent);background:var(--accent-bg);margin:1rem 0}.error{color:var(--error)}button,select,input,textarea{max-width:100%}.scroll{overflow:auto}table{border-collapse:collapse;width:100%}th,td{padding:.45rem .6rem;text-align:left;border-bottom:1px solid var(--border)}pre{white-space:pre;overflow:auto}input[type=number],select{padding:.5rem;border:1px solid var(--border-strong);background:var(--bg-elevated)}.controls{display:flex;gap:.6rem;align-items:end;flex-wrap:wrap}.controls label{display:block}.hint{font-size:.85rem;color:var(--fg-muted)}textarea.seq-input{width:100%;box-sizing:border-box}svg.debruijn{height:auto}select{max-width:100%}.seq-input:focus-visible{outline:2px solid var(--accent)}</style></head><body><main class="artifact" data-artifact="week3-debruijn-builder"><header class="artifact-head"><h1>Build a de Bruijn graph</h1><p>Split reads into k-mers, connect their (k−1)-base prefix and suffix, then choose valid outgoing edges. Graph support records repeated observations; it does not tell us the number of copies in the genome.</p></header><p class="prompt"><strong>Predict:</strong> Start with ATGACCT at k = 3 and predict the five edges. Start at AT and follow them. Then load the overlapping reads: which k-mer is observed twice, and why is that not a second genomic copy?</p><section class="panel"><label class="field-label" for="reads">One uppercase DNA read per line (up to 100 reads, 200 bases each)</label><textarea id="reads" class="seq-input" rows="4" style="width:100%" spellcheck="false">ATGACCT</textarea><div class="controls"><div><label for="k">k (2–6)</label><input id="k" type="number" min="2" max="6" value="3"></div><div><label for="representation">Displayed edge model</label><select id="representation"><option value="unique">Unique k-mer edges; label observation support</option><option value="occurrence">Occurrence multigraph: one edge per observation</option></select></div><button id="build" class="btn btn--primary" type="button">Build graph</button><button id="single" class="btn" type="button">Single sequence: ATGACCT</button><button id="baseline" class="btn" type="button">Overlapping reads: ATGAC / GACCT</button><button id="repeat" class="btn" type="button">Repeat ambiguity</button><button id="disconnected" class="btn" type="button">Disconnected reads</button></div><p id="validation" role="status" aria-live="polite"></p></section><div id="results"><section class="panel"><p id="graph-summary"></p><p id="model-note"></p><div class="scroll"><svg id="graph-svg" class="debruijn" viewBox="0 0 1000 400" style="min-width:650px;width:100%" role="img" aria-label="Directed k-mer graph; matching edge table follows"></svg></div><details><summary>Read-by-read decomposition and support table</summary><pre id="decomposition"></pre><div class="scroll"><table><thead><tr><th scope="col">Edge ID</th><th scope="col">k-mer</th><th scope="col">Prefix → suffix</th><th scope="col">Observation support</th></tr></thead><tbody id="edges"></tbody></table></div></details></section><section class="panel"><h2 style="font-size:1.3rem">Choose a traversal</h2><p>This exercise consumes each <em>displayed</em> edge at most once, respecting its direction. It spells the first node followed by one new base per edge. Several complete traversals may spell different sequences.</p><div class="controls"><div><label for="start-node">Start node</label><select id="start-node"></select></div><button id="restart" class="btn" type="button">Restart traversal</button><button id="step" class="btn btn--primary" type="button">Take the only available edge</button></div><p>Or choose a specific outgoing edge:</p><div id="choices" class="controls"></div><p id="traversal-status" role="status" aria-live="polite"></p><pre id="spelled"></pre><p id="path"></p></section></div><details class="panel"><summary>What the two edge models mean</summary><p>Unique mode merges identical k-mer types and records how often they were observed. The baseline has six observations but five unique edges: GAC was observed twice. Traversing the five unique edges once happens to reconstruct our restricted error-free toy ATGACCT. That rule is not a general assembler.</p><p>Occurrence mode treats every observation as a separate directed edge. With baseline overlapping reads this duplicates GAC; the resulting graph need not admit a single edge-covering walk. This does not mean the genome contains two consecutive GAC copies. Real assembly must address coverage, repeat multiplicity, errors, missing sequence and other information.</p><p>The repeat preset has six unique 3-mer edges. Two complete edge orders beginning at AT spell ATGATCAT and ATCATGAT. The graph cycle does not prove the molecule is circular. A longer read spanning the branch can distinguish the alternatives. Choosing a route alone supplies no new observations.</p></details></main>
+<script src="assembly-core.js"></script><script src="../_shared/resize.js" defer></script><script>
+
+(()=>{'use strict';const $=id=>document.getElementById(id),core=Week3Assembly;let graph=null,state=null,reads=[];
+function build(){try{const raw=$('reads').value;if(!raw.trim())throw new Error('Enter at least one read.');reads=raw.replace(/\r\n/g,'\n').trim().split('\n');if(reads.some(r=>!r))throw new Error('Use one read per line without blank lines.');if(Number($('k').value)>6)throw new Error('Use k from 2–6 in this visual tool.');graph=core.buildDeBruijn(reads,Number($('k').value),{occurrenceEdges:$('representation').value==='occurrence'});if(graph.nodes.length>12||graph.edges.length>20)throw new Error('Keep the visual graph to 12 nodes and 20 displayed edges; shorten reads or use fewer reads.');$('validation').textContent='';$('validation').className='';$('results').hidden=false;$('graph-summary').textContent=`${graph.nodes.length} distinct nodes, ${graph.uniqueEdgeCount} unique k-mer types, ${graph.observationCount} observations; ${graph.edges.length} displayed edges.`;$('model-note').textContent=graph.representation==='unique'?'Unique-edge graph. Support labels count observations, not genomic copies.':'Occurrence multigraph. Each observation is separate; do not infer genomic copy numbers or a required genome traversal from read depth.';$('decomposition').textContent=reads.map((r,i)=>`Read ${i+1}: ${r}\n  `+Array.from({length:r.length-graph.k+1},(_,p)=>r.slice(p,p+graph.k)).join(', ')).join('\n');$('edges').replaceChildren(...graph.edges.map(e=>{const row=document.createElement('tr');[e.id,e.kmer,`${e.from} → ${e.to}`,graph.representation==='unique'?e.support:`observation ${e.occurrence} of ${e.observedSupport}`].forEach(v=>{const c=document.createElement('td');c.textContent=v;row.appendChild(c);});return row;}));$('start-node').replaceChildren(...graph.nodes.map(n=>{const o=document.createElement('option');o.value=o.textContent=n;return o;}));const start=graph.nodes.find(n=>graph.edges.filter(e=>e.from===n).length-graph.edges.filter(e=>e.to===n).length===1)||graph.edges[0].from;$('start-node').value=start;restart();}catch(e){graph=null;state=null;$('results').hidden=true;$('validation').className='error';$('validation').textContent=e.message;}}
+function draw(){const nodes=graph.nodes,n=nodes.length,positions=new Map(nodes.map((label,i)=>{const angle=2*Math.PI*i/n-Math.PI/2;return[label,{x:500+390*Math.cos(angle),y:200+110*Math.sin(angle)}];}));let svg='<title>Directed k-mer graph</title><defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#1e3a8a"/></marker></defs>';graph.edges.forEach(e=>{const a=positions.get(e.from),b=positions.get(e.to),used=state.used.includes(e.id),same=e.from===e.to,dx=b.x-a.x,dy=b.y-a.y,d=Math.hypot(dx,dy)||1,ox=graph.representation==='occurrence'?(e.occurrence-1)*10:0;const x1=a.x+dx/d*27,y1=a.y+dy/d*27,x2=b.x-dx/d*30,y2=b.y-dy/d*30;const cx=(a.x+b.x)/2-dy/d*(25+ox),cy=(a.y+b.y)/2+dx/d*(25+ox);const path=same?`M${a.x-15},${a.y-20} C${a.x-65},${a.y-90} ${a.x+65},${a.y-90} ${a.x+15},${a.y-20}`:`M${x1},${y1} Q${cx},${cy} ${x2},${y2}`;svg+=`<path d="${path}" fill="none" stroke="${used?'#946018':'#1e3a8a'}" stroke-width="${used?3:1.5}" marker-end="url(#arrow)"/><text x="${same?a.x:cx}" y="${same?a.y-70:cy-7}" text-anchor="middle" font-family="monospace" font-size="13" fill="#1e3a8a">${e.kmer}${graph.representation==='unique'?' ×'+e.support:'#'+e.occurrence}</text>`;});nodes.forEach(label=>{const p=positions.get(label);svg+=`<circle cx="${p.x}" cy="${p.y}" r="26" fill="${label===state.current?'#eef2ff':'#f4f3ee'}" stroke="${label===state.current?'#1e3a8a':'#0a0a0a'}" stroke-width="${label===state.current?3:1.5}"/><text x="${p.x}" y="${p.y+5}" text-anchor="middle" font-family="monospace" font-size="14" fill="#0a0a0a">${label}</text>`;});$('graph-svg').innerHTML=svg;}
+function render(){draw();const choices=core.availableEdges(graph,state);$('choices').replaceChildren(...choices.map(e=>{const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=`${e.id}: ${e.from} → ${e.to}`;b.addEventListener('click',()=>take(e.id));return b;}));$('step').disabled=choices.length!==1||state.complete;$('spelled').textContent='Spelled so far: '+state.spelled;$('path').textContent='Used edge IDs: '+(state.used.join(' → ')||'none');$('traversal-status').textContent=state.complete?`Complete: used all ${graph.edges.length} displayed edges exactly once. Spelled ${state.spelled}. This does not establish biological correctness.`:choices.length?`At node ${state.current}; ${choices.length} available edge(s); ${state.used.length}/${graph.edges.length} used. Choose an outgoing edge.`:`Stopped at ${state.current} with ${graph.edges.length-state.used.length} unused edge(s). This route cannot be completed; restart or inspect another component.`;}
+function restart(){if(!graph)return;state=core.startTraversal(graph,$('start-node').value);render();}function take(id){try{state=core.stepTraversal(graph,state,id);render();}catch(e){$('traversal-status').textContent=e.message;}}
+$('build').addEventListener('click',build);$('restart').addEventListener('click',restart);$('start-node').addEventListener('change',restart);$('step').addEventListener('click',()=>{const a=core.availableEdges(graph,state);if(a.length===1)take(a[0].id);});['k','representation'].forEach(id=>$(id).addEventListener('change',build));function preset(lines){$('reads').value=lines.join('\n');$('k').value=3;$('representation').value='unique';build();}$('single').addEventListener('click',()=>preset(['ATGACCT']));$('baseline').addEventListener('click',()=>preset(['ATGAC','GACCT']));$('repeat').addEventListener('click',()=>preset(['ATG','TGA','GAT','ATC','TCA','CAT']));$('disconnected').addEventListener('click',()=>preset(['ATGA','CCGT']));build();
+})();
+</script></body></html>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 360" width="1100" height="360" role="img" aria-labelledby="title">
+<title id="title">Contigs can be linked into a scaffold while a gap remains unresolved</title>
+<style>text{font-family:Arial,sans-serif;fill:#14243b;font-size:24px}.small{font-size:21px;fill:#526071}.word{font-family:monospace;font-size:31px}.teal{fill:#0d7377}.rust{fill:#ad4936}.rule{stroke:#d9e0e5;stroke-width:2}</style>
+
+<text x="0" y="28">Contigs: continuous assembled sequences</text>
+<path d="M0 60 H375 L400 90 L375 120 H0 Z" fill="#e0efed"/><path d="M690 60 H1065 L1090 90 L1065 120 H690 Z" fill="#e0efed"/>
+<text class="word" x="195" y="101" text-anchor="middle">ATGACCT</text><text class="word" x="885" y="101" text-anchor="middle">TTAG</text>
+<text x="0" y="184">Scaffold: order and orientations supported by linking evidence</text>
+<path d="M0 217 H375 L400 247 L375 277 H0 Z" fill="#e0efed"/><path d="M690 217 H1065 L1090 247 L1065 277 H690 Z" fill="#e0efed"/>
+<text class="word" x="195" y="258" text-anchor="middle">ATGACCT</text><text class="word" x="885" y="258" text-anchor="middle">TTAG</text>
+<line x1="411" y1="247" x2="678" y2="247" stroke="#ad4936" stroke-width="3" stroke-dasharray="8 7"/>
+<text class="small rust" x="545" y="318" text-anchor="middle">Unresolved gap · schematic, length unspecified</text>
+
+</svg>

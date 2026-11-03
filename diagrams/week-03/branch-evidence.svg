@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="360" viewBox="0 0 1000 360" role="img" aria-labelledby="title desc">
+  <title id="title">Two alternative graph paths with unequal observed read support</title>
+  <desc id="desc">A schematic edge-labelled de Bruijn graph at k equals 3. From AT, the upper path passes through TG and GA to AA, spelling ATGAA. Twelve read records span this path. The lower path passes through TC and CA to AA, spelling ATCAA. Three read records span it. The counts are invented observations; whether they represent independent input molecules is not established. Neither path is deleted.</desc>
+  <metadata>Adapted from bioinformatis-web/book/figures/ch03/f3-topology-cleanup.svg, Apache-2.0. Modification: replaced automatic bubble removal and coverage-proves-truth claims with verified alternative paths, invented branch-spanning read-record counts, and an explicit unresolved evidence decision. See ../../third_party/bioinformatis-web-LICENSE.</metadata>
+  <rect width="1000" height="360" fill="#fcfcfa"/>
+  <defs>
+    <marker id="arrow-upper" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#1e3a8a"/></marker>
+    <marker id="arrow-lower" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10Z" fill="#0d7377"/></marker>
+  </defs>
+  <g font-family="Arial, sans-serif" font-size="30" font-weight="600" text-anchor="middle">
+    <text x="500" y="36" fill="#1e3a8a">ATGAA · 12 read records</text>
+    <text x="500" y="302" fill="#0d7377">ATCAA · 3 read records</text>
+  </g>
+  <g fill="none" stroke-width="3">
+    <g stroke="#1e3a8a" marker-end="url(#arrow-upper)"><path d="M144 149 299 96"/><path d="M373 82H619"/><path d="M693 93 849 147"/></g>
+    <g stroke="#0d7377" marker-end="url(#arrow-lower)"><path d="M144 171 299 224"/><path d="M373 238H619"/><path d="M693 227 849 173"/></g>
+  </g>
+  <g font-family="monospace" font-size="24" text-anchor="middle">
+    <g fill="#1e3a8a"><text x="222" y="100">ATG</text><text x="500" y="70">TGA</text><text x="778" y="100">GAA</text></g>
+    <g fill="#0d7377"><text x="222" y="242">ATC</text><text x="500" y="267">TCA</text><text x="778" y="242">CAA</text></g>
+  </g>
+  <g fill="#fcfcfa" stroke="#14243b" stroke-width="2">
+    <circle cx="110" cy="160" r="35"/><circle cx="890" cy="160" r="35"/>
+    <circle cx="340" cy="82" r="35"/><circle cx="660" cy="82" r="35"/>
+    <circle cx="340" cy="238" r="35"/><circle cx="660" cy="238" r="35"/>
+  </g>
+  <g font-family="monospace" font-size="29" text-anchor="middle" fill="#14243b">
+    <text x="110" y="170">AT</text><text x="890" y="170">AA</text>
+    <text x="340" y="92">TG</text><text x="660" y="92">GA</text>
+    <text x="340" y="248">TC</text><text x="660" y="248">CA</text>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="20" text-anchor="middle" fill="#526071">
+    <text x="500" y="330">Toy counts of records spanning a whole path; molecular independence is unknown.</text>
+    <text x="500" y="354">k = 3 · two-base nodes · three-base edge labels · neither path has been removed</text>
+  </g>
+</svg>

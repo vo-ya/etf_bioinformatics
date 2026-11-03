@@ -1,0 +1,324 @@
+{
+  "toy_sequence": "ATGACCT",
+  "k": 3,
+  "reads": [
+    "ATGAC",
+    "GACCT"
+  ],
+  "observed_counts": {
+    "ATG": 1,
+    "TGA": 1,
+    "GAC": 2,
+    "ACC": 1,
+    "CCT": 1
+  },
+  "graph": {
+    "nodes": [
+      "AC",
+      "AT",
+      "CC",
+      "CT",
+      "GA",
+      "TG"
+    ],
+    "edges": [
+      {
+        "kmer": "ACC",
+        "source": "AC",
+        "target": "CC",
+        "support": 1
+      },
+      {
+        "kmer": "ATG",
+        "source": "AT",
+        "target": "TG",
+        "support": 1
+      },
+      {
+        "kmer": "CCT",
+        "source": "CC",
+        "target": "CT",
+        "support": 1
+      },
+      {
+        "kmer": "GAC",
+        "source": "GA",
+        "target": "AC",
+        "support": 2
+      },
+      {
+        "kmer": "TGA",
+        "source": "TG",
+        "target": "GA",
+        "support": 1
+      }
+    ]
+  },
+  "provided_node_path": [
+    "AT",
+    "TG",
+    "GA",
+    "AC",
+    "CC",
+    "CT"
+  ],
+  "spelled_sequence": "ATGACCT",
+  "repeat": {
+    "sequences": [
+      "ATGATCAT",
+      "ATCATGAT"
+    ],
+    "node_paths": [
+      [
+        "AT",
+        "TG",
+        "GA",
+        "AT",
+        "TC",
+        "CA",
+        "AT"
+      ],
+      [
+        "AT",
+        "TC",
+        "CA",
+        "AT",
+        "TG",
+        "GA",
+        "AT"
+      ]
+    ],
+    "counts_k3": [
+      {
+        "ATG": 1,
+        "TGA": 1,
+        "GAT": 1,
+        "ATC": 1,
+        "TCA": 1,
+        "CAT": 1
+      },
+      {
+        "ATC": 1,
+        "TCA": 1,
+        "CAT": 1,
+        "ATG": 1,
+        "TGA": 1,
+        "GAT": 1
+      }
+    ],
+    "counts_k4": [
+      {
+        "ATGA": 1,
+        "TGAT": 1,
+        "GATC": 1,
+        "ATCA": 1,
+        "TCAT": 1
+      },
+      {
+        "ATCA": 1,
+        "TCAT": 1,
+        "CATG": 1,
+        "ATGA": 1,
+        "TGAT": 1
+      }
+    ],
+    "graph": {
+      "nodes": [
+        "AT",
+        "CA",
+        "GA",
+        "TC",
+        "TG"
+      ],
+      "edges": [
+        {
+          "kmer": "ATC",
+          "source": "AT",
+          "target": "TC",
+          "support": 1
+        },
+        {
+          "kmer": "ATG",
+          "source": "AT",
+          "target": "TG",
+          "support": 1
+        },
+        {
+          "kmer": "CAT",
+          "source": "CA",
+          "target": "AT",
+          "support": 1
+        },
+        {
+          "kmer": "GAT",
+          "source": "GA",
+          "target": "AT",
+          "support": 1
+        },
+        {
+          "kmer": "TCA",
+          "source": "TC",
+          "target": "CA",
+          "support": 1
+        },
+        {
+          "kmer": "TGA",
+          "source": "TG",
+          "target": "GA",
+          "support": 1
+        }
+      ]
+    }
+  },
+  "disconnected": {
+    "reads": [
+      "ATGA",
+      "CCGT"
+    ],
+    "graph": {
+      "nodes": [
+        "AT",
+        "CC",
+        "CG",
+        "GA",
+        "GT",
+        "TG"
+      ],
+      "edges": [
+        {
+          "kmer": "ATG",
+          "source": "AT",
+          "target": "TG",
+          "support": 1
+        },
+        {
+          "kmer": "CCG",
+          "source": "CC",
+          "target": "CG",
+          "support": 1
+        },
+        {
+          "kmer": "CGT",
+          "source": "CG",
+          "target": "GT",
+          "support": 1
+        },
+        {
+          "kmer": "TGA",
+          "source": "TG",
+          "target": "GA",
+          "support": 1
+        }
+      ]
+    }
+  },
+  "changed_observation": {
+    "reads": [
+      "ATGAC",
+      "GACCT",
+      "GATCT"
+    ],
+    "added_kmers": [
+      "ATC",
+      "GAT",
+      "TCT"
+    ],
+    "counts": {
+      "ATG": 1,
+      "TGA": 1,
+      "GAC": 2,
+      "ACC": 1,
+      "CCT": 1,
+      "GAT": 1,
+      "ATC": 1,
+      "TCT": 1
+    },
+    "graph": {
+      "nodes": [
+        "AC",
+        "AT",
+        "CC",
+        "CT",
+        "GA",
+        "TC",
+        "TG"
+      ],
+      "edges": [
+        {
+          "kmer": "ACC",
+          "source": "AC",
+          "target": "CC",
+          "support": 1
+        },
+        {
+          "kmer": "ATC",
+          "source": "AT",
+          "target": "TC",
+          "support": 1
+        },
+        {
+          "kmer": "ATG",
+          "source": "AT",
+          "target": "TG",
+          "support": 1
+        },
+        {
+          "kmer": "CCT",
+          "source": "CC",
+          "target": "CT",
+          "support": 1
+        },
+        {
+          "kmer": "GAC",
+          "source": "GA",
+          "target": "AC",
+          "support": 2
+        },
+        {
+          "kmer": "GAT",
+          "source": "GA",
+          "target": "AT",
+          "support": 1
+        },
+        {
+          "kmer": "TCT",
+          "source": "TC",
+          "target": "CT",
+          "support": 1
+        },
+        {
+          "kmer": "TGA",
+          "source": "TG",
+          "target": "GA",
+          "support": 1
+        }
+      ]
+    }
+  },
+  "lengths": [
+    {
+      "input": [
+        8,
+        7,
+        5
+      ],
+      "contigs": 3,
+      "total": 20,
+      "N50": 7,
+      "L50": 2
+    },
+    {
+      "input": [
+        12,
+        8
+      ],
+      "contigs": 2,
+      "total": 20,
+      "N50": 12,
+      "L50": 1
+    }
+  ],
+  "optional_support_filter": {
+    "GAC": 2
+  }
+}

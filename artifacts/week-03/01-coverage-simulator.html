@@ -1,0 +1,219 @@
+<!doctype html>
+<!-- Adapted from bioinformatis-web/artifacts/lecture-03/01-coverage-simulator.html, Apache-2.0.
+Modified for the 180-minute Week 3 pilot: strict inputs, exact toy assumptions,
+accessible controls and verified core calculations. Original layout/palette retained.
+See README.md and ../../third_party/bioinformatis-web-LICENSE. -->
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Mean depth and breadth · Week 3</title><link rel="stylesheet" href="../_shared/artifact-theme.css"><style>
+    body { padding: 2rem; }
+    .artifact { max-width: 1100px; margin: 0 auto; }
+
+    .artifact-head { margin-bottom: 1.5rem; }
+    .artifact-head h1 {
+      font-family: var(--font-serif);
+      font-size: var(--text-3xl);
+      letter-spacing: -0.02em;
+      margin: 0 0 0.25rem;
+    }
+    .artifact-head p {
+      color: var(--fg-muted);
+      font-size: var(--text-sm);
+      line-height: var(--leading-relaxed);
+      margin: 0;
+      max-width: 60ch;
+    }
+
+    .panel {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .panel-label {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      margin: 0 0 0.85rem;
+      font-weight: 600;
+    }
+
+    .field-label {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--fg-muted);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .btn {
+      font-family: var(--font-sans);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      padding: 0.5rem 0.9rem;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--fg);
+      cursor: pointer;
+    }
+    .btn:hover:not(:disabled) { background: var(--bg-inset); border-color: var(--border-strong); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn--primary {
+      background: var(--accent); color: #fff; border-color: var(--accent);
+    }
+    .btn--primary:hover:not(:disabled) { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+    .slider-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem 1.25rem;
+    }
+    .slider-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .slider-row .slider-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+    .slider-row .slider-value {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      color: var(--fg);
+    }
+    .slider-row input[type="range"] {
+      accent-color: var(--accent);
+      width: 100%;
+    }
+
+    .controls-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--border);
+    }
+    .mean-readout {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      color: var(--fg-muted);
+      margin-left: auto;
+    }
+    .mean-readout strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .plot-wrap {
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 0.85rem;
+      overflow-x: auto;
+    }
+    .plot-wrap + .plot-wrap { margin-top: 0.75rem; }
+    .plot-svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .plot-caption {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      color: var(--fg-subtle);
+      margin: 0.4rem 0 0;
+      letter-spacing: 0.02em;
+    }
+
+    .status-line {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      padding: 0.85rem 1rem;
+      background: var(--bg-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin-top: 1rem;
+    }
+    .status-line .label {
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--fg-subtle);
+      font-weight: 600;
+      margin: 0;
+    }
+    .status-line .value {
+      font-family: var(--font-mono);
+      font-size: var(--text-lg);
+      color: var(--fg);
+      margin: 0.15rem 0 0;
+    }
+    .status-line .value.emphasis { color: var(--accent); }
+    .status-line .value.warn     { color: var(--warning); }
+    .status-line .value.bad      { color: var(--error); }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.9rem;
+      font-family: var(--font-sans);
+      font-size: var(--text-xs);
+      color: var(--fg-muted);
+      margin-top: 0.5rem;
+    }
+    .legend-swatch {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .legend-swatch .sw {
+      display: inline-block;
+      width: 14px; height: 10px;
+      border-radius: 2px;
+    }
+    .legend-swatch .sw.bar { background: var(--accent-bg); border: 1px solid var(--accent); }
+    .legend-swatch .sw.poisson {
+      height: 0; width: 18px;
+      border: 0;
+      border-top: 2px dashed var(--fg-muted);
+    }
+
+    .hint {
+      font-size: var(--text-xs);
+      color: var(--fg-muted);
+      margin-top: 0.6rem;
+      line-height: var(--leading-relaxed);
+    }
+
+    @media (max-width: 720px) {
+      body { padding: 1rem; }
+      .panel { padding: 1rem; }
+      .artifact-head h1 { font-size: var(--text-2xl); }
+      .mean-readout { margin-left: 0; flex-basis: 100%; }
+    }
+
+[hidden]{display:none!important}.prompt{padding:.8rem 1rem;border-left:3px solid var(--accent);background:var(--accent-bg);margin:1rem 0}.error{color:var(--error)}button,select,input,textarea{max-width:100%}.scroll{overflow:auto}table{border-collapse:collapse;width:100%}th,td{padding:.45rem .6rem;text-align:left;border-bottom:1px solid var(--border)}pre{white-space:pre;overflow:auto}input[type=number],select{padding:.5rem;border:1px solid var(--border-strong);background:var(--bg-elevated)}.controls{display:flex;gap:.6rem;align-items:end;flex-wrap:wrap}.controls label{display:block}.hint{font-size:.85rem;color:var(--fg-muted)}</style></head><body><main class="artifact" data-artifact="week3-coverage-simulator"><header class="artifact-head"><h1>Mean depth and covered positions</h1><p>Drop short reads onto a small linear genome. Mean depth is the number of read bases divided by genome length. Breadth is the fraction of genome positions covered at least once.</p></header><p class="prompt"><strong>Predict:</strong> Three length-four reads cover twelve measured bases. Must they cover all twelve genome positions? Compare spread and clustered starts before resampling.</p><section class="panel"><div class="slider-grid"><div class="slider-row"><label class="field-label" for="genome">Genome length G (8–120 bases)</label><input id="genome" type="number" min="8" max="120" value="12"></div><div class="slider-row"><label class="field-label" for="length">Read length L (1–G bases)</label><input id="length" type="number" min="1" max="120" value="4"></div><div class="slider-row"><label class="field-label" for="count">Number of reads N (0–80)</label><input id="count" type="number" min="0" max="80" value="3"></div></div><div class="controls-row"><button class="btn btn--primary" id="sample" type="button">Draw uniform random starts</button><button class="btn" id="spread" type="button">Spread: starts 0, 4, 8</button><button class="btn" id="cluster" type="button">Clustered: starts 0, 0, 0</button></div><p id="status" role="status" aria-live="polite"></p></section><div id="results"><section class="panel"><p class="panel-label">Read intervals · zero-based starts, end excluded</p><div class="plot-wrap"><svg id="pileup" class="plot-svg" viewBox="0 0 1000 220" role="img" aria-label="Read intervals across the genome"></svg></div><p id="starts"></p><p class="panel-label" style="margin-top:1rem">Depth at each genome position</p><div class="plot-wrap"><svg id="depth" class="plot-svg" viewBox="0 0 1000 220" role="img" aria-label="Per-position read depth"></svg></div><div class="status-line"><div><p class="label">Mean depth N × L / G</p><p id="mean" class="value emphasis"></p></div><div><p class="label">Covered positions / G</p><p id="breadth" class="value"></p></div><div><p class="label">Uncovered positions</p><p id="uncovered" class="value"></p></div><div><p class="label">Total measured bases</p><p id="total" class="value"></p></div></div><details><summary>Numerical depth table</summary><div class="scroll"><table><thead><tr><th scope="col">Position</th><th scope="col">Depth</th></tr></thead><tbody id="depth-table"></tbody></table></div></details></section></div><details class="panel"><summary>Sampling assumptions and limits</summary><p>All reads have one fixed length, error-free and forward. Random draws independently choose an integer start uniformly from 0 through G−L, with replacement. This is a <strong>linear</strong> finite genome: end bases have fewer covering start positions than central bases. Uniform start sampling therefore does not make every base equally likely to be covered. The two preset arrangements are chosen examples, not random draws.</p><p>Repeated reads increase depth at the positions they cover, leaving other positions untouched. The simulation omits sequencing errors and sampling bias; it supplies read locations without assembling a sequence.</p></details></main>
+<script src="assembly-core.js"></script><script src="../_shared/resize.js" defer></script><script>
+
+(()=>{'use strict';const $=id=>document.getElementById(id),core=Week3Assembly;let seed=2027;
+function render(result,label){$('results').hidden=false;$('status').className='';$('status').textContent=label;$('mean').textContent=result.mean.toFixed(2)+'×';$('breadth').textContent=`${result.covered} / ${result.genomeLength} (${(100*result.breadth).toFixed(1)}%)`;$('uncovered').textContent=result.uncovered;$('total').textContent=result.sequencedBases;$('starts').textContent='Read starts: '+(result.starts.join(', ')||'none')+'. Showing at most 40 intervals; depth uses all reads.';
+const x=p=>55+p/result.genomeLength*910;let svg='<title>Read positions</title><line x1="55" y1="24" x2="965" y2="24" stroke="#0a0a0a" stroke-width="6"/>';result.starts.slice(0,40).forEach((s,i)=>{const y=42+i*3.5;svg+=`<line x1="${x(s)}" x2="${x(s+result.readLength)}" y1="${y}" y2="${y}" stroke="#1e3a8a" stroke-width="2"/>`;});[0,result.genomeLength].forEach(p=>svg+=`<text x="${x(p)}" y="207" text-anchor="middle" font-size="14" fill="#525252">${p}</text>`);$('pileup').innerHTML=svg;
+const max=Math.max(1,result.maxDepth),y=d=>180-d/max*150,bw=910/result.genomeLength;svg='<title>Depth at each position</title>';result.depth.forEach((d,p)=>{svg+=`<rect x="${x(p)}" y="${y(d)}" width="${Math.max(.5,bw-.6)}" height="${180-y(d)}" fill="${d?'#1e3a8a':'#b91c1c'}"/>`;if(!d)svg+=`<line x1="${x(p)}" x2="${x(p+1)}" y1="181" y2="181" stroke="#b91c1c" stroke-width="3"/>`;});svg+=`<text x="45" y="36" text-anchor="end" font-size="14" fill="#525252">${max}×</text><text x="45" y="184" text-anchor="end" font-size="14" fill="#525252">0×</text><text x="500" y="211" text-anchor="middle" font-size="14" fill="#525252">Genome position (zero-based; each bar is one base)</text>`;$('depth').innerHTML=svg;$('depth-table').replaceChildren(...result.depth.map((d,p)=>{const row=document.createElement('tr');[p,d].forEach(v=>{const c=document.createElement('td');c.textContent=v;row.appendChild(c);});return row;}));}
+function failure(e){$('results').hidden=true;$('status').className='error';$('status').textContent=e.message;}
+function preset(cluster){$('genome').value=12;$('length').value=4;$('count').value=3;render(core.coverageFromStarts(12,4,cluster?[0,0,0]:[0,4,8]),cluster?'Chosen clustered arrangement: mean 1×, breadth one third.':'Chosen spread arrangement: mean 1×, breadth 100%.');}
+function sample(){try{const genomeLength=Number($('genome').value),readLength=Number($('length').value),readCount=Number($('count').value);if($('genome').value===''||$('length').value===''||$('count').value==='')throw new Error('Complete all three whole-number fields.');if(genomeLength<8||genomeLength>120||readCount>80)throw new Error('Use G from 8–120 and N from 0–80.');const r=core.simulateCoverage({genomeLength,readLength,readCount,seed:seed++});render(r,`Uniform valid-start draw with seed ${r.seed}. Ends are less likely to be covered in this finite linear model.`);}catch(e){failure(e);}}
+$('sample').addEventListener('click',sample);$('spread').addEventListener('click',()=>preset(false));$('cluster').addEventListener('click',()=>preset(true));['genome','length','count'].forEach(id=>$(id).addEventListener('change',sample));preset(false);
+})();
+</script></body></html>

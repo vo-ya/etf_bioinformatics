@@ -111,3 +111,44 @@ and [figure inventory](diagrams/week-02/README.md).
 using synthetic placements. Definition sources are linked in the lesson and
 speaker notes. The worked global cell and fitting/candidate-window explanations
 are authored for this course.
+
+## Week 3 assembly material
+
+The lesson and homework narrow ideas from `lectures/lecture-03.html`,
+`markdown_resources/lesson3_md_files/lecture-03.md`, and
+`coding_exercises/lecture-03/build_notebook.py` in `bioinformatis-web`.
+The short examples, overlap workbench, ambiguity comparison, and notebook tasks
+were written for the 180-minute session. The original design and selected SVG
+layouts remain recognizable in the following adaptations:
+
+| Upstream path | Local path |
+|---|---|
+| `artifacts/lecture-03/01-coverage-simulator.html` | `artifacts/week-03/01-coverage-simulator.html` |
+| `artifacts/lecture-03/03-debruijn-builder.html` | `artifacts/week-03/02-debruijn-builder.html` |
+| `artifacts/lecture-03/04-eulerian-path.html` | Traversal ideas in `artifacts/week-03/02-debruijn-builder.html` |
+| `artifacts/lecture-03/06-n50-calculator.html` | `artifacts/week-03/03-n50-calculator.html` |
+| `diagrams/lecture-03/01-denovo-vs-resequencing.svg` | `diagrams/week-03/mapping-vs-assembly.svg` |
+| `diagrams/lecture-03/04-coverage-distribution.svg` | `diagrams/week-03/coverage-distribution.svg` |
+| `diagrams/lecture-03/07-overlap-graph.svg` | `diagrams/week-03/overlap-graph.svg` |
+| `diagrams/lecture-03/06-debruijn-graph.svg` | `diagrams/week-03/debruijn-graph.svg` |
+| `diagrams/lecture-03/09-repeat-collapse.svg` | `diagrams/week-03/repeat-ambiguity.svg` |
+| `diagrams/lecture-03/11-n50-metric.svg` | `diagrams/week-03/n50-metric.svg` |
+
+Adaptations retain Apache 2.0 notices and local theme/resize support. Changes
+include exact finite-target coverage arithmetic, explicit graph conventions,
+separate observed support and edge multiplicity, validated traversal choices,
+and base-weighted N50 with correctness caveats. The original topology-inspector
+and automatic error-correction tools are outside the required session. Source
+paths, substantial figure revisions, and model limits are recorded in the
+[tool inventory](artifacts/week-03/README.md) and
+[figure inventory](diagrams/week-03/README.md).
+
+The branch-evidence diagram additionally adapts
+`book/figures/ch03/f3-topology-cleanup.svg`. It replaces automatic branch removal
+with two verified paths, synthetic whole-path read counts, and alternative
+follow-up evidence. Its source and modifications are recorded in the SVG and
+[figure inventory](diagrams/week-03/README.md).
+
+The four illustrations `coverage-worked.svg`, `coverage-order.svg`,
+`k-connectivity.svg`, and `contig-scaffold.svg` are original course diagrams.
+The lesson, slide notes, and notebook explanations use synthetic worked examples.

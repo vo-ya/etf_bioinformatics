@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 360" width="1100" height="360" role="img" aria-labelledby="title">
+<title id="title">The same reads form a connected k=4 graph and a disconnected k=5 graph</title>
+<style>text{font-family:Arial,sans-serif;fill:#14243b;font-size:24px}.small{font-size:21px;fill:#526071}.word{font-family:monospace;font-size:31px}.teal{fill:#0d7377}.rust{fill:#ad4936}.rule{stroke:#d9e0e5;stroke-width:2}</style>
+
+<text class="small" x="0" y="25">Observed reads: ATGAC and GACCT · exact, forward orientation</text>
+<text class="teal" x="0" y="102">k = 4</text>
+<text class="word" x="140" y="102">ATG → TGA → GAC → ACC → CCT</text>
+<text class="small" x="140" y="146">Edges: ATGA, TGAC, GACC, ACCT · shared node GAC</text>
+<line class="rule" x1="0" y1="176" x2="1080" y2="176"/>
+<text class="teal" x="0" y="238">k = 5</text>
+<text class="word" x="140" y="238">ATGA → TGAC</text><text class="word" x="700" y="238">GACC → ACCT</text>
+<text class="small" x="140" y="282">edge: ATGAC</text><text class="small" x="700" y="282">edge: GACCT</text>
+<text class="rust" x="445" y="337">No observed connecting edge</text>
+
+</svg>

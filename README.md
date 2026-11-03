@@ -2,7 +2,7 @@
 
 **Course website:** [vo-ya.github.io/etf_bioinformatics](https://vo-ya.github.io/etf_bioinformatics/)
 
-A ten-week introductory course for engineering students. **Weeks 1 and 2 are published**,
+A ten-week introductory course for engineering students. **Weeks 1–3 are published**,
 with lessons, browser presentations, interactive activities, Colab homework,
 and instructor guides. Later weeks will be published separately.
 
@@ -64,6 +64,34 @@ and [homework guide](practicals/week-02/README.md) for scope and verification.
 python3 practicals/week-02/build_notebook.py
 python3 -m unittest discover -s tests -p 'test_week02_practical.py'
 node tests/test_week02_tools.js
+python3 scripts/check_pilot.py
+```
+
+## Week 3: Reconstructing DNA from fragments
+
+- [Student lesson](weeks/week-03.html)
+- [40-slide presentation](presentations/week-03/index.html)
+- [Homework in Colab](https://colab.research.google.com/github/vo-ya/etf_bioinformatics/blob/main/practicals/week-03/exercise.ipynb)
+- [Download student notebook](practicals/week-03/exercise.ipynb)
+- [Instructor notebook](practicals/week-03/solutions.ipynb)
+- [Teaching guide](teaching/week-03.html)
+
+Compare mean depth with breadth, reconstruct exact overlaps, build k-mer graphs,
+and examine repeat ambiguity and assembly statistics. The 40-slide deck includes
+worked examples of read boundaries, changing k, errors in overlapping windows,
+branch support, scaffolds, and N50's changing denominator. Its break slide and
+timing labels are removed; instructor pacing remains in the teaching guide.
+
+The homework covers k-mer counts within separate reads, graph construction,
+spelling a supplied path, and N50. Both notebook editions omit timing labels and
+include worked reminders about read boundaries and N50. The tasks use only the
+Python standard library. Edit [the generator](practicals/week-03/build_notebook.py)
+before rebuilding the notebooks.
+
+```sh
+python3 -m unittest discover -s tests -p 'test_week03_practical.py'
+node tests/test_week03_tools.js
+node tests/test_week03_interactions.js
 python3 scripts/check_pilot.py
 ```
 
