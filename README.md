@@ -2,9 +2,11 @@
 
 **Course website:** [vo-ya.github.io/etf_bioinformatics](https://vo-ya.github.io/etf_bioinformatics/)
 
-A ten-week introductory course for engineering students. **Weeks 1–3 are published**,
-with lessons, browser presentations, interactive activities, Colab homework,
-and instructor guides. Later weeks will be published separately.
+A ten-week introductory course for engineering students. **Weeks 1–4 are published**.
+Weeks 1–3 include lessons, browser presentations, interactive activities,
+Colab homework, and instructor guides. Week 4 adds a guided Python workshop,
+a Smith–Waterman simulator, and research and coding project examples.
+Later weeks will be published separately.
 
 ## Week 1: Reading life as data
 
@@ -94,6 +96,39 @@ node tests/test_week03_tools.js
 node tests/test_week03_interactions.js
 python3 scripts/check_pilot.py
 ```
+
+## Week 4: Guided Python and project ideas
+
+- [Workshop page and project menu](weeks/week-04.html)
+- [Student notebook](practicals/week-04/exercise.ipynb)
+- [Instructor notebook](practicals/week-04/solutions.ipynb)
+- [Teaching plan](teaching/week-04.html)
+- [Notebook authoring and checks](practicals/week-04/README.md)
+
+Students work through seven small steps: strings, positions, GC arithmetic,
+loops, windows, lists, and a supplied plot. Every example runs; students predict,
+make small edits, and explain outputs. An optional two-track browser previews
+one possible project. A standalone Smith–Waterman appendix adds editable
+sequences and scoring, a DP table, cell-by-cell inspection, and traceback.
+The menu contains [two full research examples](weeks/week-04.html#research-projects)
+and [two full coding examples](weeks/week-04.html#coding-projects), followed by
+[ten one-line alternatives](weeks/week-04.html#more-project-ideas). The full
+coding examples are a genome-region browser and an LLM bioinformatics
+question-answering tool with source-support evaluation. Research and coding
+remain separate project types; the alternatives also include LLM topics.
+Each final project carries **30% of the
+final grade**, with **six weeks** to complete approximately **24 hours of work
+per student** (four hours per week). The final package includes the work,
+its validation, a report, and an explanation or demonstration. There are no
+weekly milestones or interim submissions; the classroom examples are starting
+points rather than complete project submissions.
+
+The 180-minute class includes a ten-minute break, 115 minutes of guided setup
+and coding, 40 minutes introducing projects, and 15 minutes for exit work and
+handoff. A separate 60–90-minute follow-up consolidates Python and includes
+personal project-planning notes, whose preparation counts toward the project
+budget. This workshop replaces the previous Week 4 variation placeholder;
+the later placement of variation is still to be decided within the ten weeks.
 
 ## Homework and authoring
 

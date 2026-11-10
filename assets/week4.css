@@ -1,0 +1,27 @@
+/* Week 4 workshop and project menu; shared course typography and palette. */
+.workshop { max-width: 1080px; margin: auto; padding: 2rem 1.5rem 5rem; }
+.workshop header { max-width: 850px; margin: 2rem 0 3rem; }
+.workshop h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); margin: .6rem 0 1rem; }
+.workshop h2 { font-size: 1.8rem; margin: 2.5rem 0 1rem; }
+.workshop h3 { font-size: 1.3rem; margin: 1rem 0 .7rem; }
+.workshop p, .workshop li { max-width: 80ch; }
+.workshop nav { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; }
+.workshop table { width: 100%; border-collapse: collapse; }
+.workshop th, .workshop td { padding: .7rem; border-bottom: 1px solid var(--border); text-align: left; vertical-align: top; }
+.workshop pre { overflow-x: auto; padding: 1.2rem; background: var(--bg-muted); border-radius: 6px; }
+.workshop section, .workshop article { scroll-margin-top: 1.5rem; }
+.workshop details { border: 1px solid var(--border); border-radius: 6px; padding: 1rem; margin: 1rem 0; background: var(--bg-elevated); }
+.workshop summary { cursor: pointer; font-weight: 600; }
+.workshop details[open] summary { margin-bottom: 1rem; }
+.workshop figure { margin: 1.5rem 0; }
+.workshop figure img { width: 100%; height: auto; border: 1px solid var(--border); border-radius: 6px; }
+.workshop figcaption { color: var(--fg-muted); font-size: .9rem; margin-top: .7rem; max-width: 85ch; }
+.project-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2rem; }
+.project-card { border: 1px solid var(--border); border-radius: 8px; background: var(--bg-elevated); padding: 1.4rem; }
+.project-card h3 { margin-top: .5rem; }
+.project-card dl { margin: 1rem 0; }
+.project-card dt { font-weight: 600; margin-top: .8rem; }
+.project-card dd { margin-left: 0; margin-top: .2rem; }
+.project-type { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); font-weight: 600; }
+@media (max-width: 720px) { .project-grid { grid-template-columns: 1fr; } .workshop { padding: 1.5rem 1rem 3rem; } }
+@media print { .project-grid { display: block; } .project-card { break-inside: avoid; margin-bottom: 1rem; } .workshop nav, .actions { display: none; } }

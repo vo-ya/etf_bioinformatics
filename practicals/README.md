@@ -1,17 +1,32 @@
-# Colab homework setup
+# Colab notebooks and setup
 
-Each week has a standalone student `exercise.ipynb` and a complete instructor
+Each available week has a standalone student `exercise.ipynb` and a complete instructor
 `solutions.ipynb`. Uploading one notebook is enough: no Python helper file,
 dataset download, Drive mounting, package installation, or paid accelerator
-is required. Homework follows each lecture; extensions are optional.
+is required. Weeks 1–3 use these notebooks as homework. Week 4 is a guided
+in-class workshop followed by consolidation and personal project planning. Extensions
+are optional.
 
 | Week | Student notebook | Instructor notebook |
 |---|---|---|
 | 1 | [FASTQ and confidence](week-01/exercise.ipynb) | [Reference](week-01/solutions.ipynb) |
 | 2 | [Search and alignment](week-02/exercise.ipynb) | [Reference](week-02/solutions.ipynb) |
 | 3 | [K-mers, graphs, and N50](week-03/exercise.ipynb) | [Reference](week-03/solutions.ipynb) |
+| 4 | [Guided Python workshop](week-04/exercise.ipynb) | [Instructor answers](week-04/solutions.ipynb) |
 
-## Open, run, and save
+## Week 4 workshop
+
+Follow the [Week 4 guide](week-04/README.md). Its working examples use small
+edits, predictions, and explanations, with no unfinished function stubs.
+Plotting is supplied and has a printed-results fallback. The optional browser
+renderer previews a project; it is not a required workshop implementation task.
+The separate final project carries 30% of the final grade and is completed
+within six weeks, with about 24 hours of work per student. Coding projects
+assume intermediate Python. Research projects are a separate choice, with
+an evidence-based report and presentation and no programming deliverable.
+There are no weekly milestones or interim project submissions.
+
+## Weeks 1–3: open, run, and save
 
 The Open in Colab badges use
 `https://colab.research.google.com/github/vo-ya/etf_bioinformatics/blob/main/practicals/week-NN/exercise.ipynb`.
@@ -35,7 +50,7 @@ table works if plotting is unavailable. Weeks 2 and 3 need only ordinary Python.
 See the [official Colab FAQ](https://research.google.com/colaboratory/faq.html)
 for upload, storage, download, and CPU runtime settings.
 
-## Reference cells and generator conventions
+## Weeks 1–3 reference cells and generator conventions
 
 The original course's form mechanism is preserved: **both** a first-line
 `#@title` comment and `metadata.cellView = "form"` are present. Reference
@@ -63,6 +78,7 @@ Regenerate and check from the repository root:
 python3 practicals/week-01/build_notebook.py
 python3 practicals/week-02/build_notebook.py
 python3 practicals/week-03/build_notebook.py
+python3 practicals/week-04/build_notebook.py
 python3 -m unittest discover -s tests -p 'test_week0*_practical.py'
 ```
 

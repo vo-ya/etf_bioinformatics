@@ -152,3 +152,12 @@ follow-up evidence. Its source and modifications are recorded in the SVG and
 The four illustrations `coverage-worked.svg`, `coverage-order.svg`,
 `k-connectivity.svg`, and `contig-scaffold.svg` are original course diagrams.
 The lesson, slide notes, and notebook explanations use synthetic worked examples.
+
+## Week 4 workshop
+
+Week 4 examples, invented DNA, annotation intervals, project briefs, and the
+rendered preview were authored for this course. The notebook generator uses
+the shared helper for Colab URLs and form metadata; its upstream Apache 2.0
+packaging attribution remains in `practicals/week-04/LICENSE.upstream.txt`.
+Python, matplotlib, UCSC, sequencing-provider documentation, and the T2T paper
+are linked as references in the materials; their images and prose are not copied.
