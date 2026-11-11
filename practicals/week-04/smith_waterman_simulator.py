@@ -170,6 +170,8 @@ def sw_show(result, cells_to_show=None, inspect=None, plot=True):
                           arrowprops={"arrowstyle": "->", "color": "#c45100", "lw": 2})
     axis.scatter([j], [i], s=300, marker="s", facecolors="none", edgecolors="#a00080", linewidths=2)
     axis.set_xticks(range(n + 1)); axis.set_xticklabels(labels_x)
+    axis.xaxis.tick_top()
+    axis.xaxis.set_label_position("top")
     axis.set_yticks(range(m + 1)); axis.set_yticklabels(labels_y)
     axis.set_xlabel("Sequence 2: column j (prefix length)")
     axis.set_ylabel("Sequence 1: row i (prefix length)")
