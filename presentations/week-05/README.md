@@ -49,6 +49,15 @@ before changing a control. The same components appear in the student guide.
 Each activity has reset controls and a static print/no-JavaScript fallback.
 Sliders and selectors keep the deck from consuming their arrow keys.
 
+The [student lesson](../../weeks/week-05.html) provides the full prose explanations
+and worked calculations, with each activity placed after its related discussion.
+It shares Week 3's illustrated header, sticky contents, mobile navigation,
+section typography, and homework layout through the common lesson styles.
+Edit that HTML for lesson text; `assets/week5-lesson.css` fits the Week 5 controls
+within the shared layout without changing other weeks or the slides.
+The activity builder replaces only the five `WEEK05 LAB` marker pairs in place;
+keep those markers when editing so regeneration preserves the lesson structure.
+
 Edit `labs_markup.py`, `assets/week5-core.js`, `assets/week5-interactions.js`,
 and `assets/week5-interactions.css` (asset paths relative to the repository root).
 Run both `python3 presentations/week-05/build_slides.py` and

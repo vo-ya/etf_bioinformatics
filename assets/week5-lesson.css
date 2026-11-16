@@ -1,0 +1,29 @@
+/* Week 5 uses the shared Week 3 lesson layout; these rules fit its live controls. */
+.week5-lesson .worked-example h3 { margin-top: .5rem; }
+.week5-lesson .lesson-activity { scroll-margin-top: 1.5rem; }
+.week5-lesson .w5-lab { font-size: 1rem; margin-top: 1rem; }
+.week5-lesson .w5-prompt, .week5-lesson .w5-result { font-size: 1.15rem; }
+.week5-lesson .w5-detail { font-size: 1rem; line-height: 1.6; }
+.week5-lesson .w5-controls label { flex-wrap: wrap; min-width: 0; max-width: 100%; font-size: 1rem; }
+.week5-lesson .w5-controls select { display: inline-block; width: auto; max-width: 100%; padding: .5rem; }
+.week5-lesson .w5-controls input[type=range] { width: 125px; min-height: 36px; }
+.week5-lesson .w5-lab button, .week5-lesson .w5-controls select,
+.week5-lesson .w5-controls input[type=number] { font-size: 1rem; }
+.week5-lesson .w5-likelihood > div { grid-template-columns: 60px minmax(80px,1fr) 250px; font-size: 1rem; }
+.week5-lesson .w5-likelihood small { font-size: .9rem; }
+.week5-lesson .w5-block-label { width: 145px; font-size: 1rem; }
+.week5-lesson .w5-block { min-width: 50px; padding: 8px; }
+@media (max-width: 650px) {
+ .week5-lesson .w5-block-label { width: 110px; font-size: .9rem; }
+ .week5-lesson .w5-block-row { gap: 3px; flex-wrap: wrap; }
+ .week5-lesson .w5-block { min-width: 30px; padding: 6px; font-size: 1rem; }
+ .week5-lesson .w5-likelihood > div { grid-template-columns: 45px 1fr; }
+ .week5-lesson .w5-likelihood small { grid-column: 2; }
+ .week5-lesson .w5-controls { gap: 12px; }
+ .week5-lesson .w5-read { min-width: 45px; }
+ .week5-lesson .intro-topbar { align-items: flex-start; }
+ .week5-lesson .topbar-links { flex-wrap: wrap; justify-content: flex-end; }
+}
+@media print {
+ .week5-lesson h2, .week5-lesson h3 { break-after: avoid; }
+}
