@@ -1,0 +1,37 @@
+@import url('../week-03/slides.css');
+.hero:before { content: '05'; }
+.slide h2 { font-size: 51px; }
+.slide .content { gap: 10px; }
+.slide .content > p { margin-bottom: 10px; }
+.slide .answer-line { margin-top: 12px; font-size: 27px; }
+.slide .prompt { font-size: 29px; margin-top: 10px; }
+.slide .figure { max-height: 370px; }
+.slide .sequence { font-size: 32px; line-height: 1.55; letter-spacing: .02em; }
+.slide .formula { font-size: 32px; }
+.slide .table { width: 100%; border-collapse: collapse; font-size: 27px; }
+.slide .table th, .slide .table td { text-align: left; border-bottom: 1px solid var(--line); padding: 12px 18px 12px 0; }
+.slide .table th { color: var(--teal); font-weight: 600; }
+.slide .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 45px; align-items: start; }
+.slide .two-columns p { font-size: 29px; }
+.slide .big-number { font: 68px Georgia,serif; color: var(--teal); }
+.slide .flow { display: flex; justify-content: space-between; align-items: center; font-size: 30px; border-block: 1px solid var(--line); padding: 30px 0; }
+.slide .flow span { max-width: 210px; }
+.slide .vcf { font: 24px/1.8 ui-monospace,monospace; white-space: pre-wrap; margin: 0; }
+.slide .inline-links { flex-wrap: wrap; }
+@media print {
+ .slide h2 { font-size: 11.5mm; }
+ .slide .table { font-size: 6mm; }
+ .slide .table th, .slide .table td { padding: 2.5mm 3mm 2.5mm 0; }
+ .slide .sequence, .slide .formula { font-size: 7mm; }
+ .slide .vcf { font-size: 5.4mm; }
+ .slide .figure { max-height: 84mm; }
+ .slide .answer-line { font-size: 6mm; }
+ .slide .flow { font-size: 6.5mm; padding: 6mm 0; }
+ .slide .big-number { font-size: 15mm; }
+}
+/* Live activities keep controls within the existing slide canvas. */
+.slide .w5-lab .w5-prompt { font-size:22px; }
+.slide .w5-lab .w5-result { font-size:24px; }
+.slide .w5-block-row { margin:7px 0; }
+.slide .w5-block { padding:6px 12px; }
+.slide .w5-lab .w5-detail { font-size:20px; }

@@ -2,11 +2,12 @@
 
 **Course website:** [vo-ya.github.io/etf_bioinformatics](https://vo-ya.github.io/etf_bioinformatics/)
 
-A ten-week introductory course for engineering students. **Weeks 1–4 are published**.
+A ten-week introductory course for engineering students. **Weeks 1–5 are published**.
 Weeks 1–3 include lessons, browser presentations, interactive activities,
 Colab homework, and instructor guides. Week 4 adds a guided Python workshop,
 a Smith–Waterman simulator, and research and coding project examples.
-Later weeks will be published separately.
+Week 5 adds variant calling and structural variants, interactive slides,
+a guided exercise, and a separate BAM practical. Later weeks will be published separately.
 
 ## Week 1: Reading life as data
 
@@ -127,8 +128,34 @@ The 180-minute class includes a ten-minute break, 115 minutes of guided setup
 and coding, 40 minutes introducing projects, and 15 minutes for exit work and
 handoff. A separate 60–90-minute follow-up consolidates Python and includes
 personal project-planning notes, whose preparation counts toward the project
-budget. This workshop replaces the previous Week 4 variation placeholder;
-the later placement of variation is still to be decided within the ten weeks.
+budget. Week 5 follows with variant calling and structural variants.
+
+## Week 5: Variant calling and structural variants
+
+- [Student guide](weeks/week-05.html)
+- [38-slide browser presentation](presentations/week-05/index.html)
+- [Exercise notebook](practicals/week-05/exercise.ipynb)
+- [Instructor answers](practicals/week-05/solutions.ipynb)
+- [Additional BAM exercise](practicals/week-05/bam_exercise.ipynb) and [BAM instructor answers](practicals/week-05/bam_solutions.ipynb)
+- [Teaching guide and 180-minute schedule](teaching/week-05.html)
+
+Inspect synthetic pileups, compare genotype evidence, and use read depth,
+paired ends, split reads, and assembly to investigate structural variants.
+Six original SVG figures and the notebook share the worked examples. The
+separate 60–90-minute exercise uses short runnable cells with editing and
+interpretation tasks. A binary genotype-likelihood extension is optional.
+The deck has answer reveals, notes, keyboard controls, and print styling.
+Five live activities let students filter reads, vary genotype evidence, rearrange
+sequence blocks, inspect coverage cases, and check VCF coordinates. The same
+activities appear in the student guide.
+See the presentation and notebook READMEs for authoring and verification.
+The additional BAM notebook uses pysam to create, inspect, filter, and write real
+BAM files; it needs an initial package install if pysam is missing. It is separate
+75–90-minute practice, with locally generated data and no genome download.
+
+RNA abundance is displaced from Week 5. Its placement and the scope of Week 6
+(expression statistics in the existing map) need revision before those
+materials are authored; the course remains ten weeks.
 
 ## Homework and authoring
 

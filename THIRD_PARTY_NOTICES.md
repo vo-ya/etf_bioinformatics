@@ -161,3 +161,14 @@ the shared helper for Colab URLs and form metadata; its upstream Apache 2.0
 packaging attribution remains in `practicals/week-04/LICENSE.upstream.txt`.
 Python, matplotlib, UCSC, sequencing-provider documentation, and the T2T paper
 are linked as references in the materials; their images and prose are not copied.
+
+## Week 5 variant calling and structural variants
+
+Topic selection draws on the original `bioinformatis-web` Lecture 4 variant
+curriculum. Week 5 prose, synthetic datasets, worked calculations, and six SVG
+figures were authored for this course. No original Lecture 4 images or tools
+were copied. VCF definitions and SV evidence are referenced to the hts-specs
+specification and GATK documentation in the materials. Presentation controls
+reuse this repository's existing browser deck. Notebook form packaging uses
+the shared helper, with its upstream license retained in
+`practicals/week-05/LICENSE.upstream.txt`.

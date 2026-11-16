@@ -3,7 +3,8 @@
 Each available week has a standalone student `exercise.ipynb` and a complete instructor
 `solutions.ipynb`. Uploading one notebook is enough: no Python helper file,
 dataset download, Drive mounting, package installation, or paid accelerator
-is required. Weeks 1–3 use these notebooks as homework. Week 4 is a guided
+is required for the original exercises. The additional Week 5 BAM notebook
+installs pysam if missing and then creates its data locally. Weeks 1–3 use these notebooks as homework. Week 4 is a guided
 in-class workshop followed by consolidation and personal project planning. Extensions
 are optional.
 
@@ -13,6 +14,15 @@ are optional.
 | 2 | [Search and alignment](week-02/exercise.ipynb) | [Reference](week-02/solutions.ipynb) |
 | 3 | [K-mers, graphs, and N50](week-03/exercise.ipynb) | [Reference](week-03/solutions.ipynb) |
 | 4 | [Guided Python workshop](week-04/exercise.ipynb) | [Instructor answers](week-04/solutions.ipynb) |
+| 5 | [Variant evidence and structural variants](week-05/exercise.ipynb) | [Instructor answers](week-05/solutions.ipynb) |
+| 5 additional | [BAM files in Python](week-05/bam_exercise.ipynb) | [BAM instructor answers](week-05/bam_solutions.ipynb) |
+
+## Week 5 variant evidence
+
+The [Week 5 notebook](week-05/README.md) is separate 60–90-minute homework.
+Students change quality filters, compare strand support, plot depth, and read
+two VCF records. All cells run; the tasks require edits and explanations.
+The optional genotype-likelihood extension adds 10–15 minutes.
 
 ## Week 4 workshop
 
