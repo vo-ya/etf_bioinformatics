@@ -129,7 +129,7 @@ class Week05Tests(unittest.TestCase):
                 if tag=='section' and 'slide' in attrs.get('class','').split(): self.slides.append(attrs)
                 if tag=='img': self.images.append(attrs)
         parser=Parser(); parser.feed((ROOT/'presentations/week-05/index.html').read_text())
-        self.assertEqual([s['id'] for s in parser.slides],[f'slide-{i:02}' for i in range(1,39)])
+        self.assertEqual([s['id'] for s in parser.slides],[f'slide-{i:02}' for i in range(1,41)])
         for i,s in enumerate(parser.slides,1): self.assertTrue(s['aria-label'].startswith(f'Slide {i}:'))
         self.assertEqual(len(parser.images),6)
         self.assertEqual(950-250,700)

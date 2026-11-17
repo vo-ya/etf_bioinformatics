@@ -1,6 +1,6 @@
 # Week 5 browser presentation
 
-Open [index.html](index.html) in a browser. The deck has 38 slides, six original
+Open [index.html](index.html) in a browser. The deck has 40 slides, six original
 SVG figures, answer reveals, speaker notes, keyboard navigation, fullscreen,
 and print styling. It follows the course's existing 1280×720 browser format.
 No PowerPoint file is included.
@@ -86,3 +86,20 @@ Their coordinates, CIGAR consumption, and Phred+33 decoding were verified; all
 five activities still appear at their updated slide numbers. Seven Python tests,
 the interactive model checks, and the site checks pass (25 HTML pages, 749 local
 links/fragments, and 31 JavaScript syntax checks).
+
+## Mutation consequences
+
+Slides 39–40 close the deck with silent (synonymous), missense, and nonsense
+substitutions, then frameshift versus in-frame indels. The examples show mRNA
+codons in the 5′→3′ direction using the standard genetic code. Notes also explain
+stop-loss, splice-site, and regulatory consequences. The student guide includes
+the same examples; the final teaching block includes six minutes for them within
+the existing 180-minute class. Edit `build_slides.py` before regenerating.
+
+The two closing slides were visually checked in Chromium, including the silent
+answer reveal, final-slide navigation, and print layout. Both fit above their
+footers, all 40 slides appear in print, and the student guide has no horizontal
+overflow at 390 pixels. Seven Week 5 Python tests and the interactive model
+checks passed; six BAM tests were skipped because pysam is unavailable. The
+site checker passed for 25 HTML pages, 801 local links/fragments, and 31
+JavaScript syntax checks.

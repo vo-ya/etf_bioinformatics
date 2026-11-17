@@ -133,7 +133,7 @@ budget. Week 5 follows with variant calling and structural variants.
 ## Week 5: Variant calling and structural variants
 
 - [Student guide](weeks/week-05.html)
-- [38-slide browser presentation](presentations/week-05/index.html)
+- [40-slide browser presentation](presentations/week-05/index.html)
 - [Exercise notebook](practicals/week-05/exercise.ipynb)
 - [Instructor answers](practicals/week-05/solutions.ipynb)
 - [Additional BAM exercise](practicals/week-05/bam_exercise.ipynb) and [BAM instructor answers](practicals/week-05/bam_solutions.ipynb)
