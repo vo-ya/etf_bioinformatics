@@ -2,6 +2,9 @@
 
 **Course website:** [vo-ya.github.io/etf_bioinformatics](https://vo-ya.github.io/etf_bioinformatics/)
 
+**Student projects:** [Project catalogue and final submission requirements](projects/README.md)
+— seven research and seven coding options, including LLM projects.
+
 A ten-week introductory course for engineering students. **Weeks 1–5 are published**.
 Weeks 1–3 include lessons, browser presentations, interactive activities,
 Colab homework, and instructor guides. Week 4 adds a guided Python workshop,
